@@ -16,6 +16,7 @@
 - Q: Should there be a maximum wait time after which a hung generation is treated as a failure and shown the retry state? → A: Yes — enforce a maximum wait time; if exceeded, treat it as a failure and show the retry state.
 - Q: Should the MVP have an explicit accessibility requirement, or is that left to implementation discretion? → A: Require baseline accessibility (keyboard navigation, screen-reader compatible labels); localization out of scope.
 - Q: Should the spec commit to a concrete concurrency/scale target, or leave it unconstrained for this version? → A: Leave unconstrained — no specific concurrency target required for this version.
+- Q: The approved Figma result-page design shows Download Markdown, Share Specification, and Copy to Clipboard actions, but the spec previously stated the output is fully view-only. How should this be reconciled? → A: Implement Download Markdown and Copy to Clipboard as client-side-only actions (no backend persistence); omit Share Specification, since sharing implies a persistent shareable link that contradicts the no-persistence assumption.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -164,6 +165,10 @@ and the previous result is no longer shown as the active result.
   view, returning them to the idea-entry step.
 - **FR-016**: System MUST treat a newly generated specification as replacing the previously
   displayed one as the active result (no side-by-side history in this version).
+- **FR-020**: System MUST let the user download the generated specification as a Markdown
+  file, generated client-side from the already-displayed content (no server-side storage).
+- **FR-021**: System MUST let the user copy the generated specification's content to their
+  clipboard.
 
 **Data handling & privacy**
 
@@ -179,9 +184,9 @@ and the previous result is no longer shown as the active result.
   elements (inputs, buttons, progress stage indicators).
 
 **Out of scope for this version**: user accounts and authentication, team collaboration
-features, saving or retrieving multiple past specifications, advanced project-management
-features (e.g., task assignment, tracking), direct source-code generation, and
-localization/internationalization.
+features, saving or retrieving multiple past specifications, sharing/shareable links for a
+specification, advanced project-management features (e.g., task assignment, tracking),
+direct source-code generation, and localization/internationalization.
 
 ### Key Entities
 
@@ -229,9 +234,10 @@ localization/internationalization.
   planning (e.g., enough to identify a viable software concept, capped to keep generation
   time and cost predictable); exact character/word counts are an implementation detail, not
   a product requirement.
-- The generated specification is view-only in this version — no export, download, print, or
-  copy-to-file capability is required, consistent with "saving multiple specifications"
-  being out of scope; users may use their browser's own copy/print capabilities if desired.
+- The generated specification supports client-side-only Download (Markdown file) and Copy
+  to Clipboard actions, per the approved Figma result-page design; no server-side storage,
+  sharing, or shareable links are provided, consistent with "saving multiple specifications"
+  being out of scope. Users may also use their browser's own print capability if desired.
 - No user accounts exist in this version, so "the user" refers to whoever is present in the
   current browser session; there is no cross-device or cross-session continuity.
 - No specific concurrency or scale target is required for this version; the system is
