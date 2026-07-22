@@ -122,10 +122,10 @@ Again" and confirm the user returns to idea-entry with no trace of the previous 
 
 ### Implementation for User Story 3
 
-- [ ] T035 [P] [US3] Implement client-side "Download Markdown" action, with an `aria-label` on its icon button per FR-019 (Blob + object-URL anchor click, no network request) in `frontend/src/components/result/ActionsPanel.tsx` per research.md #6 (FR-020)
-- [ ] T036 [P] [US3] Implement client-side "Copy to Clipboard" action, with an `aria-label` on its icon button per FR-019 (`navigator.clipboard.writeText`) in `frontend/src/components/result/ActionsPanel.tsx` (FR-021)
-- [ ] T037 [US3] Implement "Generate Again" action resetting `SpecificationContext` to `idle` and routing to `/generate`, in `frontend/src/components/result/ActionsPanel.tsx` (depends on T012, T028)
-- [ ] T038 [US3] Assemble `ActionsPanel` (Generate Again, Download Markdown, Copy to Clipboard — no Share button, per the resolved design/spec conflict) into `ResultPage`, and verify a new generation fully replaces the prior result with no leftover content (FR-016) (depends on T035, T036, T037)
+- [X] T035 [P] [US3] Implement client-side "Download Markdown" action, with an `aria-label` on its icon button per FR-019 (Blob + object-URL anchor click, no network request) in `frontend/src/components/result/ActionsPanel.tsx` per research.md #6 (FR-020)
+- [X] T036 [P] [US3] Implement client-side "Copy to Clipboard" action, with an `aria-label` on its icon button per FR-019 (`navigator.clipboard.writeText`) in `frontend/src/components/result/ActionsPanel.tsx` (FR-021)
+- [X] T037 [US3] Implement "Generate Again" action resetting `SpecificationContext` to `idle` and routing to `/generate`, in `frontend/src/components/result/ActionsPanel.tsx` (depends on T012, T028)
+- [X] T038 [US3] Assemble `ActionsPanel` (Generate Again, Download Markdown, Copy to Clipboard — no Share button, per the resolved design/spec conflict) into `ResultPage`, and verify a new generation fully replaces the prior result with no leftover content (FR-016) (depends on T035, T036, T037)
 
 **Checkpoint**: All 3 user stories are independently functional.
 
