@@ -41,15 +41,56 @@ export function asText(value: unknown, field: string): string {
   return value.trim();
 }
 
-/** Asserts a value is a non-empty array of non-empty strings. */
+// Field names commonly used by the model for a short label vs. the descriptive body when it
+// returns an array of objects instead of an array of strings.
+const LABEL_KEYS = ['title', 'name', 'category', 'area', 'label'];
+const BODY_KEYS = [
+  'description',
+  'detail',
+  'details',
+  'text',
+  'value',
+  'consideration',
+  'requirement',
+  'summary',
+];
+
+/**
+ * Coerces a single list entry to a readable string. Real models frequently return an array of
+ * objects (e.g. { category, description }) where the schema asked for strings; this flattens
+ * such objects to "Label: Description" (or the best available text) so a well-formed—but
+ * differently-shaped—response is still usable rather than a hard failure.
+ */
+function coerceToText(item: unknown): string {
+  if (typeof item === 'string') return item.trim();
+  if (typeof item === 'number' || typeof item === 'boolean') return String(item);
+  if (item && typeof item === 'object') {
+    const obj = item as Record<string, unknown>;
+    const pick = (keys: string[]) =>
+      keys.map((k) => obj[k]).find((v) => typeof v === 'string' && v.trim() !== '') as
+        string | undefined;
+    const label = pick(LABEL_KEYS);
+    const body = pick(BODY_KEYS);
+    if (label && body) return `${label.trim()}: ${body.trim()}`;
+    if (body) return body.trim();
+    if (label) return label.trim();
+    const strings = Object.values(obj)
+      .filter((v): v is string => typeof v === 'string' && v.trim() !== '')
+      .map((v) => v.trim());
+    if (strings.length) return strings.join(' — ');
+  }
+  return '';
+}
+
+/**
+ * Asserts a value is a non-empty array and returns it as non-empty strings. Tolerates entries
+ * the model returns as objects by flattening them (see coerceToText).
+ */
 export function asTextArray(value: unknown, field: string): string[] {
   if (!Array.isArray(value)) {
     throw new Error(`Model response field "${field}" is not an array.`);
   }
-  const items = value
-    .filter((item): item is string => typeof item === 'string')
-    .map((item) => item.trim())
-    .filter((item) => item !== '');
+  const items = value.map(coerceToText).filter((item) => item !== '');
   if (items.length === 0) {
     throw new Error(`Model response field "${field}" has no usable entries.`);
   }

@@ -48,5 +48,13 @@ export default tseslint.config(
       'react-refresh/only-export-components': 'off',
     },
   },
+  {
+    // Landing atoms intentionally co-locate their card/step component with the static content
+    // data it renders; fast refresh is not a concern for this presentational data.
+    files: ['src/components/landing/FeatureCard.tsx', 'src/components/landing/HowItWorksStep.tsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
   prettier,
 );

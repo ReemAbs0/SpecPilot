@@ -102,11 +102,11 @@ required.
 
 ### Implementation for User Story 2
 
-- [ ] T030 [P] [US2] Build `Hero` component (headline, subtext, primary "Generate Specification" + secondary "Learn More" buttons) in `frontend/src/components/landing/Hero.tsx`
-- [ ] T031 [P] [US2] Build `FeatureCard` and the 6-card capability grid in `frontend/src/components/landing/FeatureCard.tsx`
-- [ ] T032 [P] [US2] Build `HowItWorksStep` and the 4-step sequence in `frontend/src/components/landing/HowItWorksStep.tsx`
-- [ ] T033 [P] [US2] Build `ContactCard` and `CtaBanner` in `frontend/src/components/landing/`
-- [ ] T034 [US2] Assemble `LandingPage` composing `Hero` + `FeatureCard` grid + `HowItWorksStep` sequence + `ContactCard` + `CtaBanner`, with the primary CTA routing to `/generate`, in `frontend/src/pages/LandingPage.tsx` (depends on T030–T033)
+- [X] T030 [P] [US2] Build `Hero` component (headline, subtext, primary "Generate Specification" + secondary "Learn More" buttons) in `frontend/src/components/landing/Hero.tsx`
+- [X] T031 [P] [US2] Build `FeatureCard` and the 6-card capability grid in `frontend/src/components/landing/FeatureCard.tsx`
+- [X] T032 [P] [US2] Build `HowItWorksStep` and the 4-step sequence in `frontend/src/components/landing/HowItWorksStep.tsx`
+- [X] T033 [P] [US2] Build `ContactCard` and `CtaBanner` in `frontend/src/components/landing/`
+- [X] T034 [US2] Assemble `LandingPage` composing `Hero` + `FeatureCard` grid + `HowItWorksStep` sequence + `ContactCard` + `CtaBanner`, with the primary CTA routing to `/generate`, in `frontend/src/pages/LandingPage.tsx` (depends on T030–T033)
 
 **Checkpoint**: User Stories 1 AND 2 both work independently.
 

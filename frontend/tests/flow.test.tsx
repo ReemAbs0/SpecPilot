@@ -60,7 +60,8 @@ beforeEach(() => {
     'fetch',
     vi.fn(async () => ({ status: 202, json: async () => ({ sessionId: 'test-session' }) })),
   );
-  window.history.pushState({}, '', '/');
+  // Start on the generator so this US1 flow test is independent of the landing page.
+  window.history.pushState({}, '', '/generate');
 });
 
 afterEach(() => {
@@ -72,7 +73,6 @@ describe('User Story 1 — idea to specification', () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.click(screen.getByRole('button', { name: /get started/i }));
     const textarea = await screen.findByLabelText(/describe your software idea/i);
     await user.type(
       textarea,
@@ -99,7 +99,6 @@ describe('User Story 1 — idea to specification', () => {
     const user = userEvent.setup();
     render(<App />);
 
-    await user.click(screen.getByRole('button', { name: /get started/i }));
     const textarea = await screen.findByLabelText(/describe your software idea/i);
     await user.type(textarea, 'too short');
     await user.click(screen.getByRole('button', { name: /generate specification/i }));
