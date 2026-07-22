@@ -39,16 +39,18 @@ Tracks one in-progress (or just-finished) attempt to turn a `ProjectIdea` into a
 |---|---|---|
 | `id` | `string` | Session identifier, generated per request; used only to correlate the SSE stream to its POST request — not a persistent/reusable ID. |
 | `idea` | `ProjectIdea` | The input being processed. |
-| `status` | `"running" \| "succeeded" \| "failed"` | Overall session status. |
-| `activeStage` | `GenerationStage \| null` | Which of the 5 stages is currently running; `null` once `status` is `"succeeded"` or `"failed"`. |
+| `status` | `"running" \| "succeeded" \| "failed" \| "cancelled"` | Overall session status. `"cancelled"` is set when the user clicks Cancel Generation (FR-011b) — distinct from `"failed"`, which is a system-detected error/timeout (FR-011/FR-011a). |
+| `activeStage` | `GenerationStage \| null` | Which of the 5 stages is currently running; `null` once `status` is `"succeeded"`, `"failed"`, or `"cancelled"`. |
 | `completedStages` | `GenerationStage[]` | Stages finished so far, in order — drives the done/active/pending UI state per stage (FR-010). |
 | `failureReason` | `"upstream-error" \| "timeout" \| null` | Set only when `status === "failed"`; `"timeout"` corresponds to FR-011a (research.md #3, 90s), `"upstream-error"` to a generic AI-call failure (FR-011). |
 
 **Lifecycle**: `running` (activeStage = stage 1) → ... → `running` (activeStage = stage 5)
 → `succeeded` (with a `Specification` produced) **or** `failed` (with a `failureReason`) at
-any point along the way. Once terminal (`succeeded`/`failed`), the session is discarded
-after the client has read the corresponding SSE terminal event — nothing persists past
-that (FR-017).
+any point along the way. `running` can also transition directly to `cancelled` at any point
+if the user clicks Cancel Generation (FR-011b) — no `failureReason` is set for this path,
+and no SSE event is emitted for it (the client already knows it cancelled; see
+contracts/api.md). Once terminal (`succeeded`/`failed`/`cancelled`), the session is
+discarded — nothing persists past that (FR-017).
 
 ## Specification
 

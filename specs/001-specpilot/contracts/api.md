@@ -71,10 +71,19 @@ Server-Sent Events stream of stage progress and the terminal outcome for one ses
   `timeout` is emitted by the server itself if 90s elapse without a terminal event
   (research.md #3); `upstream-error` covers any AI-call failure at any stage.
 
-**Client contract**: the frontend MUST treat any stream disconnect without a terminal
-event (`generation-succeeded`/`generation-failed`) the same as `generation-failed` with
-reason `upstream-error`, so a dropped connection never leaves the user stuck on the
-Generating page indefinitely (FR-011).
+**Client contract**: the frontend MUST treat any *unexpected* stream disconnect (network
+drop) without a terminal event (`generation-succeeded`/`generation-failed`) the same as
+`generation-failed` with reason `upstream-error`, so a dropped connection never leaves the
+user stuck on the Generating page indefinitely (FR-011).
+
+**Cancellation (FR-011b)**: an *intentional* disconnect — the user clicking "Cancel
+Generation," which closes the `EventSource` client-side — is different: the frontend
+navigates straight back to the Generator with no failure state shown. Server-side, closing
+the connection MUST trigger the session's `AbortController`, which sets the session's
+in-memory `status` to `"cancelled"` (data-model.md) and stops any further agent stage
+calls; no partial result is produced or retained, and no SSE event is emitted for this
+transition (the client already knows it cancelled). FR-017 still applies — nothing about a
+cancelled session is logged either.
 
 ## Retry semantics (FR-011)
 

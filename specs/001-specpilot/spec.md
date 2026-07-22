@@ -17,6 +17,8 @@
 - Q: Should the MVP have an explicit accessibility requirement, or is that left to implementation discretion? → A: Require baseline accessibility (keyboard navigation, screen-reader compatible labels); localization out of scope.
 - Q: Should the spec commit to a concrete concurrency/scale target, or leave it unconstrained for this version? → A: Leave unconstrained — no specific concurrency target required for this version.
 - Q: The approved Figma result-page design shows Download Markdown, Share Specification, and Copy to Clipboard actions, but the spec previously stated the output is fully view-only. How should this be reconciled? → A: Implement Download Markdown and Copy to Clipboard as client-side-only actions (no backend persistence); omit Share Specification, since sharing implies a persistent shareable link that contradicts the no-persistence assumption.
+- Q: The Generating-page design shows a "Cancel Generation" link with no corresponding spec requirement — what should it do? → A: Clicking it stops the active generation session and returns the user to the specification generator page; no generated result is saved from a cancelled generation.
+- Q: The Result-page design shows an edit icon next to the title with no corresponding spec requirement — what should it do? → A: It is decorative only in this version; it does not enable editing of the generated specification.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -45,6 +47,9 @@ document (with all required sections) is displayed. Delivers the core value on i
 3. **Given** a user submits an empty or extremely short idea description, **When** they try
    to submit it, **Then** the system prevents submission and explains what additional detail
    is needed.
+4. **Given** generation is in progress, **When** the user clicks Cancel Generation, **Then**
+   the session stops, no result is saved, and the user returns to the specification
+   generator with their original idea text still available (FR-011b).
 
 ---
 
@@ -151,6 +156,10 @@ and the previous result is no longer shown as the active result.
   completed within that time, the system MUST treat it as a failure and show the same
   failure/retry state as FR-011 (exact duration is an implementation detail set during
   planning).
+- **FR-011b**: System MUST let the user cancel an in-progress generation. Cancelling MUST
+  stop the active generation session, discard any partial result, and return the user to
+  the specification generator with their original idea text still available (same as the
+  FR-011 retry behavior), rather than showing the failure state.
 
 **Generated specification**
 
@@ -175,6 +184,8 @@ and the previous result is no longer shown as the active result.
 - **FR-017**: System MUST treat submitted idea text and the generated specification as
   ephemeral — neither is retained or logged beyond the active session; both are discarded
   once the session ends (tab closed, navigated away, or a new specification is generated).
+  This explicitly includes application/error logs: idea text and specification content
+  MUST NOT appear in any server-side log output.
 
 **Accessibility**
 
@@ -194,7 +205,7 @@ direct source-code generation, and localization/internationalization.
   the sole input to the generation process for a single session.
 - **Generation Session**: The in-progress attempt to turn a Project Idea into a
   Specification; tracks which of the five defined stages is currently active and whether it
-  succeeded, failed, or is still running.
+  succeeded, failed, was cancelled by the user (FR-011b), or is still running.
 - **Specification**: The structured output document produced for one Project Idea,
   composed of the eight required sections (project summary, target users, user roles,
   functional requirements, non-functional requirements, user stories, development
@@ -244,3 +255,6 @@ direct source-code generation, and localization/internationalization.
   expected to serve individual users reliably without a committed simultaneous-user target.
 - The maximum generation wait time (FR-011a) will be set to a reasonable value during
   planning; the exact duration is an implementation detail, not a product requirement.
+- The edit icon shown next to the specification title in the approved Figma result-page
+  design is decorative only in this version; it does not enable editing of the generated
+  specification (no FR covers in-place editing of a result).

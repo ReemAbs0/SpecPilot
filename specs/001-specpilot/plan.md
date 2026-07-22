@@ -63,7 +63,7 @@ after which it is treated as a failure per FR-011a.
 
 | Principle | Assessment |
 |---|---|
-| I. Design Fidelity | **Pass.** Page/component structure below is derived directly from the four approved Figma screens. The one real design/spec conflict found (export actions on the result page) was raised to the user and resolved explicitly (spec updated with FR-020/FR-021) rather than silently decided either way. |
+| I. Design Fidelity | **Pass.** Page/component structure below is derived directly from the four approved Figma screens. Three design elements with no spec backing (result-page export actions, the Generating page's Cancel link, and the Result page's edit icon) were each raised to the user and resolved explicitly (spec updated with FR-020/FR-021, FR-011b, and a decorative-edit-icon assumption) rather than silently decided either way. |
 | II. Simplicity First | **Pass.** Express (no heavyweight framework), React Context + `useReducer` for state (no Redux/Zustand), no database/ORM, a single hosted AI HTTP call instead of standing up a separate agent runtime process. |
 | III. Clear Separation of Concerns | **Pass.** Backend splits into `api/` (HTTP layer), `agents/` (five stage modules = AI generation logic), `services/` (orchestration + Fetch.ai client), `models/` (data shapes). Frontend splits `pages/` (routing/composition) from `components/` (presentation) from `services/` + `state/` (data/business logic), matching the constitution's UI → orchestration → data dependency direction. |
 | IV. Specification Quality | **Pass.** data-model.md and the agent contract (contracts/api.md) require all eight output sections on every successful generation; formatting is its own dedicated stage. |
@@ -165,12 +165,14 @@ all four Figma screens (buttons, badges, cards) to avoid duplicating design-syst
 - Generator: `IdeaForm` (textarea + mic icon + Clear/Generate buttons), `WritingTipsCard`,
   `ExamplePromptsCard` (clickable prompt chips that prefill the textarea)
 - Generating: `ProgressCard` (icon, title, subtitle), `StageListItem` (×5, check/spinner/
-  empty-circle states matching FR-010), `ProgressBar`, cancel action (maps to a user-facing
-  interrupt of FR-011/FR-011a)
-- Result: `ResultHeader` (status badge + timestamp + title + edit affordance),
-  `SpecificationSection` (collapsible, one per required section from FR-013),
-  `ActionsPanel` (Download Markdown, Copy to Clipboard, Generate Again — Share Specification
-  intentionally omitted per the resolved design/spec conflict)
+  empty-circle states matching FR-010), `ProgressBar`, a "Cancel Generation" action that
+  stops the session and returns to the Generator (FR-011b — distinct from the system-
+  detected failure covered by FR-011/FR-011a)
+- Result: `ResultHeader` (status badge + timestamp + title + a decorative edit icon with no
+  behavior in this version — no FR covers in-place editing), `SpecificationSection`
+  (collapsible, one per required section from FR-013), `ActionsPanel` (Download Markdown,
+  Copy to Clipboard, Generate Again — Share Specification intentionally omitted per the
+  resolved design/spec conflict)
 
 **Layout structure**: Fixed top `Navbar` (logo left, nav links + primary CTA right) on
 every page; single-column centered content (`max-w` container) on Generator/Generating;
