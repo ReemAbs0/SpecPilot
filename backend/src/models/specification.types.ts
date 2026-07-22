@@ -81,6 +81,8 @@ export interface Milestone {
  * as a failure, not a partially-empty success.
  */
 export interface Specification {
+  /** Concise specification title shown as the result-page heading (produced by stage 1). */
+  title: string;
   projectSummary: string;
   targetUsers: string;
   userRoles: string[];

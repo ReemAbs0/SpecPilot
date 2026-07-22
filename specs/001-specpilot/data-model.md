@@ -58,6 +58,7 @@ The structured output document for one `ProjectIdea` (spec: Key Entities, FR-013
 
 | Field | Type | Notes |
 |---|---|---|
+| `title` | `string` | A concise specification title shown as the result-page heading (design fidelity — the approved result screen leads with a generated title). Produced by the understanding-idea stage. |
 | `projectSummary` | `string` | Section 1. |
 | `targetUsers` | `string` | Section 2. |
 | `userRoles` | `string[]` | Section 3 — list of distinct roles identified from the idea. |

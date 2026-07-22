@@ -88,6 +88,8 @@ export interface Milestone {
  * successful generation (FR-013/FR-014).
  */
 export interface Specification {
+  /** Concise specification title shown as the result-page heading (produced by stage 1). */
+  title: string;
   projectSummary: string;
   targetUsers: string;
   userRoles: string[];

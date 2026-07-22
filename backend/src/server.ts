@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express, { type NextFunction, type Request, type Response } from 'express';
+import { specificationsRouter } from './api/specifications.route';
 
 // Express app + server bootstrap (T010). The configured `app` is exported so HTTP contract
 // tests (T039) can import it with Supertest without binding a port; the server only starts
@@ -14,8 +15,8 @@ app.get('/api/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok' });
 });
 
-// User-story routes (POST /api/specifications and the SSE stream) are registered here in
-// later tasks (T021, T022).
+// Generation endpoints: POST /api/specifications and GET /api/specifications/:id/stream.
+app.use('/api', specificationsRouter);
 
 // 404 for unknown routes.
 app.use((_req: Request, res: Response) => {
