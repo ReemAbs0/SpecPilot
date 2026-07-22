@@ -1,13 +1,36 @@
+import { type ReactNode } from 'react';
 import { Mail, Code2, User } from 'lucide-react';
 import { Button, Card } from '../ui';
 
-// "Get in Touch" card (T033). Contact links are placeholders for this version (no contact
-// backend), consistent with the footer's placeholder links.
+// "Get in Touch" card (T033). Each contact link performs a real action rather than jumping to
+// the top of the page. Replace CONTACT_EMAIL and the social URLs with the team's real details.
+const CONTACT_EMAIL = 'hello@specpilot.app';
 
-const CONTACTS = [
-  { icon: <Mail className="h-4 w-4" aria-hidden="true" />, label: 'Email' },
-  { icon: <Code2 className="h-4 w-4" aria-hidden="true" />, label: 'GitHub' },
-  { icon: <User className="h-4 w-4" aria-hidden="true" />, label: 'LinkedIn' },
+interface Contact {
+  icon: ReactNode;
+  label: string;
+  href: string;
+  external?: boolean;
+}
+
+const CONTACTS: Contact[] = [
+  {
+    icon: <Mail className="h-4 w-4" aria-hidden="true" />,
+    label: 'Email',
+    href: `mailto:${CONTACT_EMAIL}`,
+  },
+  {
+    icon: <Code2 className="h-4 w-4" aria-hidden="true" />,
+    label: 'GitHub',
+    href: 'https://github.com',
+    external: true,
+  },
+  {
+    icon: <User className="h-4 w-4" aria-hidden="true" />,
+    label: 'LinkedIn',
+    href: 'https://www.linkedin.com',
+    external: true,
+  },
 ];
 
 export function ContactCard() {
@@ -22,7 +45,8 @@ export function ContactCard() {
         {CONTACTS.map((contact) => (
           <a
             key={contact.label}
-            href="#"
+            href={contact.href}
+            {...(contact.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
             className="flex items-center gap-1.5 rounded-md text-sm text-slate-600 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
           >
             {contact.icon}
@@ -30,7 +54,7 @@ export function ContactCard() {
           </a>
         ))}
       </div>
-      <a href="#" className="mt-6 inline-block">
+      <a href={`mailto:${CONTACT_EMAIL}?subject=SpecPilot%20inquiry`} className="mt-6 inline-block">
         <Button variant="primary">Contact Us</Button>
       </a>
     </Card>
