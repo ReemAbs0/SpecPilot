@@ -8,6 +8,15 @@
 
 **Input**: User description: "Build SpecPilot, an AI-powered software specification generator. Users describe a software idea and the system analyzes it and generates a structured software specification document, showing generation progress through defined stages, and allowing review and regeneration."
 
+## Clarifications
+
+### Session 2026-07-22
+
+- Q: Should submitted idea text be retained/logged by the system after generation completes, or treated as ephemeral? → A: Ephemeral only — idea text and generated result exist only for the active session and are not stored after.
+- Q: Should there be a maximum wait time after which a hung generation is treated as a failure and shown the retry state? → A: Yes — enforce a maximum wait time; if exceeded, treat it as a failure and show the retry state.
+- Q: Should the MVP have an explicit accessibility requirement, or is that left to implementation discretion? → A: Require baseline accessibility (keyboard navigation, screen-reader compatible labels); localization out of scope.
+- Q: Should the spec commit to a concrete concurrency/scale target, or leave it unconstrained for this version? → A: Leave unconstrained — no specific concurrency target required for this version.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Generate a specification from a project idea (Priority: P1)
@@ -92,6 +101,9 @@ and the previous result is no longer shown as the active result.
 - What happens when the AI generation process fails partway through (e.g., an upstream
   error)? The system MUST show a clear failure state and let the user retry without losing
   their original idea text.
+- What happens when generation takes longer than the maximum allowed wait time without
+  explicitly failing? The system MUST treat this as a failure and show the same
+  failure/retry state as an explicit error (see FR-011a).
 - What happens if the user navigates away or closes the tab while generation is in progress?
   Generation state is not required to persist across sessions (see Assumptions).
 - How does the system handle an idea description that is unrelated to software (e.g.,
@@ -134,6 +146,10 @@ and the previous result is no longer shown as the active result.
   running.
 - **FR-011**: System MUST show a clear failure state if generation cannot complete, and MUST
   allow the user to retry without re-typing their original idea description.
+- **FR-011a**: System MUST enforce a maximum generation wait time; if generation has not
+  completed within that time, the system MUST treat it as a failure and show the same
+  failure/retry state as FR-011 (exact duration is an implementation detail set during
+  planning).
 
 **Generated specification**
 
@@ -149,9 +165,23 @@ and the previous result is no longer shown as the active result.
 - **FR-016**: System MUST treat a newly generated specification as replacing the previously
   displayed one as the active result (no side-by-side history in this version).
 
+**Data handling & privacy**
+
+- **FR-017**: System MUST treat submitted idea text and the generated specification as
+  ephemeral — neither is retained or logged beyond the active session; both are discarded
+  once the session ends (tab closed, navigated away, or a new specification is generated).
+
+**Accessibility**
+
+- **FR-018**: System MUST support keyboard-only navigation through the landing page, idea
+  submission, generation progress, and result views.
+- **FR-019**: System MUST provide screen-reader-compatible labels for all interactive
+  elements (inputs, buttons, progress stage indicators).
+
 **Out of scope for this version**: user accounts and authentication, team collaboration
 features, saving or retrieving multiple past specifications, advanced project-management
-features (e.g., task assignment, tracking), and direct source-code generation.
+features (e.g., task assignment, tracking), direct source-code generation, and
+localization/internationalization.
 
 ### Key Entities
 
@@ -204,3 +234,7 @@ features (e.g., task assignment, tracking), and direct source-code generation.
   being out of scope; users may use their browser's own copy/print capabilities if desired.
 - No user accounts exist in this version, so "the user" refers to whoever is present in the
   current browser session; there is no cross-device or cross-session continuity.
+- No specific concurrency or scale target is required for this version; the system is
+  expected to serve individual users reliably without a committed simultaneous-user target.
+- The maximum generation wait time (FR-011a) will be set to a reasonable value during
+  planning; the exact duration is an implementation detail, not a product requirement.
