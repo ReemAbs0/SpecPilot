@@ -33,12 +33,12 @@ Web application (per plan.md): `backend/src/`, `backend/tests/`, `frontend/src/`
 
 **Purpose**: Project initialization and basic tooling for both projects
 
-- [ ] T001 Create the `backend/` and `frontend/` directory skeletons per plan.md's Project Structure
-- [ ] T002 Initialize backend TypeScript project with `strict: true` in `backend/tsconfig.json`: `backend/package.json`, Express + `dotenv` dependencies
-- [ ] T003 [P] Initialize frontend Vite + React + TypeScript project with `strict: true` in `frontend/tsconfig.json` and Tailwind CSS in `frontend/` (`frontend/package.json`, `frontend/tailwind.config.ts`)
-- [ ] T004 [P] Configure ESLint + Prettier for `backend/` and `frontend/` (shared style rules, TypeScript strict mode per constitution Principle VI)
-- [ ] T005 [P] Configure Vitest in `backend/vitest.config.ts` (+ Supertest dependency) and `frontend/vitest.config.ts` (+ React Testing Library dependency), per research.md #7
-- [ ] T006 Create `backend/.env.example` and `frontend/.env.example` documenting all variables from quickstart.md (`FETCH_AI_API_KEY`, `FETCH_AI_ENDPOINT_URL`, `PORT`, `GENERATION_TIMEOUT_MS`, `IDEA_MIN_LENGTH`, `IDEA_MAX_LENGTH`, `VITE_API_BASE_URL`)
+- [X] T001 Create the `backend/` and `frontend/` directory skeletons per plan.md's Project Structure
+- [X] T002 Initialize backend TypeScript project with `strict: true` in `backend/tsconfig.json`: `backend/package.json`, Express + `dotenv` dependencies
+- [X] T003 [P] Initialize frontend Vite + React + TypeScript project with `strict: true` in `frontend/tsconfig.json` and Tailwind CSS in `frontend/` (`frontend/package.json`, `frontend/tailwind.config.ts`)
+- [X] T004 [P] Configure ESLint + Prettier for `backend/` and `frontend/` (shared style rules, TypeScript strict mode per constitution Principle VI)
+- [X] T005 [P] Configure Vitest in `backend/vitest.config.ts` (+ Supertest dependency) and `frontend/vitest.config.ts` (+ React Testing Library dependency), per research.md #7
+- [X] T006 Create `backend/.env.example` and `frontend/.env.example` documenting all variables from quickstart.md (`FETCH_AI_API_KEY`, `FETCH_AI_ENDPOINT_URL`, `PORT`, `GENERATION_TIMEOUT_MS`, `IDEA_MIN_LENGTH`, `IDEA_MAX_LENGTH`, `VITE_API_BASE_URL`)
 
 ---
 
@@ -48,14 +48,14 @@ Web application (per plan.md): `backend/src/`, `backend/tests/`, `frontend/src/`
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T007 Define shared types (`ProjectIdea`, `GenerationStage`, `GenerationSession` — with `status: "running" | "succeeded" | "failed" | "cancelled"` — `Specification`, `UserStory`, `Milestone`) in `backend/src/models/specification.types.ts` per data-model.md
-- [ ] T008 [P] Mirror the same types (including the 4-value `status` union) in `frontend/src/types/specification.types.ts` per data-model.md
-- [ ] T009 Implement the Fetch.ai hosted-endpoint HTTP client in `backend/src/services/fetchAiClient.ts`, reading `FETCH_AI_API_KEY`/`FETCH_AI_ENDPOINT_URL` from env (research.md #1) — no secrets hardcoded
-- [ ] T010 Implement the Express app + server bootstrap (reads `PORT` from env, JSON body parsing, centralized error-handling middleware that MUST NOT log request/response bodies — idea text and specification content are never written to any log per FR-017) in `backend/src/server.ts`
-- [ ] T011 Implement the React Router route table for the 4 pages (`/`, `/generate`, `/generate/progress`, `/result`) in `frontend/src/App.tsx` per plan.md's UI Architecture
-- [ ] T012 Implement `SpecificationContext` (reducer states `idle → submitting → generating → success | error`, holding idea text, active stage, result/error) in `frontend/src/state/SpecificationContext.tsx` per research.md #5
-- [ ] T013 [P] Build shared UI primitives — `Button` (primary/secondary), `Badge`, `Card` — with visible keyboard focus states in `frontend/src/components/ui/`
-- [ ] T014 [P] Build shared `Navbar` and `Footer` components (logo, nav links, primary CTA) in `frontend/src/components/layout/`
+- [X] T007 Define shared types (`ProjectIdea`, `GenerationStage`, `GenerationSession` — with `status: "running" | "succeeded" | "failed" | "cancelled"` — `Specification`, `UserStory`, `Milestone`) in `backend/src/models/specification.types.ts` per data-model.md
+- [X] T008 [P] Mirror the same types (including the 4-value `status` union) in `frontend/src/types/specification.types.ts` per data-model.md
+- [X] T009 Implement the Fetch.ai hosted-endpoint HTTP client in `backend/src/services/fetchAiClient.ts`, reading `FETCH_AI_API_KEY`/`FETCH_AI_ENDPOINT_URL` from env (research.md #1) — no secrets hardcoded
+- [X] T010 Implement the Express app + server bootstrap (reads `PORT` from env, JSON body parsing, centralized error-handling middleware that MUST NOT log request/response bodies — idea text and specification content are never written to any log per FR-017) in `backend/src/server.ts`
+- [X] T011 Implement the React Router route table for the 4 pages (`/`, `/generate`, `/generate/progress`, `/result`) in `frontend/src/App.tsx` per plan.md's UI Architecture
+- [X] T012 Implement `SpecificationContext` (reducer states `idle → submitting → generating → success | error`, holding idea text, active stage, result/error) in `frontend/src/state/SpecificationContext.tsx` per research.md #5
+- [X] T013 [P] Build shared UI primitives — `Button` (primary/secondary), `Badge`, `Card` — with visible keyboard focus states in `frontend/src/components/ui/`
+- [X] T014 [P] Build shared `Navbar` and `Footer` components (logo, nav links, primary CTA) in `frontend/src/components/layout/`
 
 **Checkpoint**: Foundation ready — user story implementation can now begin
 
