@@ -135,12 +135,12 @@ Again" and confirm the user returns to idea-entry with no trace of the previous 
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T039 [P] Write backend contract tests for `POST /api/specifications` and the SSE stream event shapes in `backend/tests/contract/specifications.contract.test.ts` per contracts/api.md
-- [ ] T040 [P] Write frontend component tests for `IdeaForm` validation and `ResultPage` section rendering in `frontend/tests/`
-- [ ] T041 [P] Add a root `README.md` summarizing setup, pointing to quickstart.md for environment variables and run/validation steps
-- [ ] T042 Manually verify the `GENERATION_TIMEOUT_MS` timeout path (research.md #3) surfaces the FR-011 failure/retry state as described in quickstart.md's "Failure/timeout path"
-- [ ] T043 Run all quickstart.md validation scenarios end-to-end (US1, US2, US3, failure path, and the new Cancel Generation path) and record results — as part of this, manually submit 2-3 varied idea descriptions and confirm each generated section is genuinely idea-specific, not generic/templated text (FR-014), since this isn't practically unit-testable
-- [ ] T044 [P] Add a backend test asserting no request/response body content (idea text or specification content) appears in log output, in `backend/tests/unit/logging.test.ts` (FR-017)
+- [X] T039 [P] Write backend contract tests for `POST /api/specifications` and the SSE stream event shapes in `backend/tests/contract/specifications.contract.test.ts` per contracts/api.md
+- [X] T040 [P] Write frontend component tests for `IdeaForm` validation and `ResultPage` section rendering in `frontend/tests/`
+- [X] T041 [P] Add a root `README.md` summarizing setup, pointing to quickstart.md for environment variables and run/validation steps
+- [X] T042 Manually verify the `GENERATION_TIMEOUT_MS` timeout path (research.md #3) surfaces the FR-011 failure/retry state as described in quickstart.md's "Failure/timeout path"
+- [X] T043 Run all quickstart.md validation scenarios end-to-end (US1, US2, US3, failure path, and the new Cancel Generation path) and record results — as part of this, manually submit 2-3 varied idea descriptions and confirm each generated section is genuinely idea-specific, not generic/templated text (FR-014), since this isn't practically unit-testable
+- [X] T044 [P] Add a backend test asserting no request/response body content (idea text or specification content) appears in log output, in `backend/tests/unit/logging.test.ts` (FR-017)
 
 ---
 
