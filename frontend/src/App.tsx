@@ -1,10 +1,13 @@
 import { BrowserRouter, Routes, Route, Outlet, Link } from 'react-router-dom';
+import { AuthProvider } from './state/AuthContext';
 import { SpecificationProvider } from './state/SpecificationContext';
 import { Navbar } from './components/layout/Navbar';
 import LandingPage from './pages/LandingPage';
 import GeneratorPage from './pages/GeneratorPage';
 import GeneratingPage from './pages/GeneratingPage';
 import ResultPage from './pages/ResultPage';
+import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
 
 // Route table across the four pages (T011, wired in T029; Landing added in T034).
 
@@ -32,18 +35,22 @@ function NotFound() {
 
 export default function App() {
   return (
-    <SpecificationProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route element={<AppLayout />}>
-            <Route index element={<LandingPage />} />
-            <Route path="generate" element={<GeneratorPage />} />
-            <Route path="generate/progress" element={<GeneratingPage />} />
-            <Route path="result" element={<ResultPage />} />
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </SpecificationProvider>
+    <AuthProvider>
+      <SpecificationProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route element={<AppLayout />}>
+              <Route index element={<LandingPage />} />
+              <Route path="generate" element={<GeneratorPage />} />
+              <Route path="generate/progress" element={<GeneratingPage />} />
+              <Route path="result" element={<ResultPage />} />
+              <Route path="login" element={<LoginPage />} />
+              <Route path="signup" element={<SignupPage />} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </SpecificationProvider>
+    </AuthProvider>
   );
 }
