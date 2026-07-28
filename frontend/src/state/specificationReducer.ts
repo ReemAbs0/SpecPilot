@@ -47,9 +47,7 @@ export type SpecAction =
   | { type: 'SUCCEEDED'; specification: Specification }
   | { type: 'FAILED'; reason: GenerationFailureReason }
   // Cancel an in-progress generation (FR-011b): return to idle but keep the idea text.
-  | { type: 'CANCEL' }
-  // Start over from the result view (FR-015/FR-016): clear everything, including the idea.
-  | { type: 'RESET' };
+  | { type: 'CANCEL' };
 
 export function specReducer(state: SpecState, action: SpecAction): SpecState {
   switch (action.type) {
@@ -87,8 +85,6 @@ export function specReducer(state: SpecState, action: SpecAction): SpecState {
     case 'CANCEL':
       // Keep ideaText so the user can resubmit without re-typing (FR-011b).
       return { ...initialSpecState, ideaText: state.ideaText };
-    case 'RESET':
-      return initialSpecState;
     default:
       return state;
   }
