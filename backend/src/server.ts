@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express, { type NextFunction, type Request, type Response } from 'express';
 import { specificationsRouter } from './api/specifications.route';
+import { mySpecificationsRouter } from './api/mySpecifications.route';
 
 // Express app + server bootstrap (T010). The configured `app` is exported so HTTP contract
 // tests (T039) can import it with Supertest without binding a port; the server only starts
@@ -17,6 +18,10 @@ app.get('/api/health', (_req: Request, res: Response) => {
 
 // Generation endpoints: POST /api/specifications and GET /api/specifications/:id/stream.
 app.use('/api', specificationsRouter);
+
+// Authenticated persistence endpoints (feature/firebase-auth): /api/me/specifications.
+// These are token-protected and separate from the anonymous generation flow above.
+app.use('/api/me', mySpecificationsRouter);
 
 // 404 for unknown routes.
 app.use((_req: Request, res: Response) => {
