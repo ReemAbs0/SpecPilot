@@ -1,5 +1,8 @@
 import type { Specification } from '../types/specification.types';
-import type { SavedSpecificationSummary } from '../types/savedSpecification.types';
+import type {
+  SavedSpecification,
+  SavedSpecificationSummary,
+} from '../types/savedSpecification.types';
 
 // Talks to the authenticated persistence endpoints (feature/firebase-auth, Phase 4b/5). Like
 // specificationApi.ts, it uses relative /api URLs so the Vite dev proxy (and same-origin
@@ -77,6 +80,43 @@ export async function listSpecifications(idToken: string): Promise<ListResult> {
     } catch {
       return { ok: false, error: 'bad_response' };
     }
+  }
+  return { ok: false, error: `status_${response.status}` };
+}
+
+export interface GetResult {
+  ok: boolean;
+  saved?: SavedSpecification;
+  /** True on a 404 — the id does not exist for this user (distinct from a generic error). */
+  notFound?: boolean;
+  /** Machine-readable failure hint for logging; never shown to the user. */
+  error?: string;
+}
+
+/**
+ * Fetches one saved specification in full by id. Distinguishes a 404 (notFound) from other
+ * failures so the detail page can show the right state. Returns a result object, never throws.
+ */
+export async function getSpecification(idToken: string, id: string): Promise<GetResult> {
+  let response: Response;
+  try {
+    response = await fetch(`/api/me/specifications/${encodeURIComponent(id)}`, {
+      headers: { Authorization: `Bearer ${idToken}` },
+    });
+  } catch {
+    return { ok: false, error: 'network_error' };
+  }
+
+  if (response.status === 200) {
+    try {
+      const saved = (await response.json()) as SavedSpecification;
+      return { ok: true, saved };
+    } catch {
+      return { ok: false, error: 'bad_response' };
+    }
+  }
+  if (response.status === 404) {
+    return { ok: false, notFound: true };
   }
   return { ok: false, error: `status_${response.status}` };
 }
