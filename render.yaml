@@ -1,0 +1,39 @@
+# Render blueprint for the SpecPilot backend (Node.js + Express web service).
+# Deploy via the Render dashboard ("New +" → "Blueprint") pointed at this repo, or edit an
+# existing service to match. The backend keeps its current architecture — a long-running web
+# service, NOT serverless functions.
+#
+# Secrets (sync: false) are NOT stored here — set them in the Render dashboard:
+#   - FETCH_AI_API_KEY        : your Fetch.ai / ASI:One API key
+#   - FIREBASE_PROJECT_ID     : your Firebase project id
+#   - FIREBASE_SERVICE_ACCOUNT: the service-account JSON, inlined as a single-line string
+#                               (use this on Render — the file-path option is for local dev)
+#   - CORS_ORIGIN             : the deployed frontend origin, e.g. https://<app>.vercel.app
+services:
+  - type: web
+    name: specpilot-backend
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: FETCH_AI_API_KEY
+        sync: false
+      - key: FETCH_AI_ENDPOINT_URL
+        value: https://api.asi1.ai/v1
+      - key: FETCH_AI_MODEL
+        value: asi1-mini
+      - key: GENERATION_TIMEOUT_MS
+        value: "90000"
+      - key: IDEA_MIN_LENGTH
+        value: "20"
+      - key: IDEA_MAX_LENGTH
+        value: "2000"
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_SERVICE_ACCOUNT
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false

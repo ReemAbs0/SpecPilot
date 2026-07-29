@@ -14,7 +14,10 @@ export default defineConfig({
     css: false,
     // Dummy Firebase Web config so `getAuth` (called at import of src/lib/firebase.ts) can
     // initialize in jsdom without a real project. Tests never make real auth calls.
+    // VITE_API_BASE_URL is pinned empty so API URLs stay relative in tests regardless of any
+    // developer's local .env (which may point it at a running backend).
     env: {
+      VITE_API_BASE_URL: '',
       VITE_FIREBASE_API_KEY: 'test-api-key',
       VITE_FIREBASE_AUTH_DOMAIN: 'test-project.firebaseapp.com',
       VITE_FIREBASE_PROJECT_ID: 'test-project',

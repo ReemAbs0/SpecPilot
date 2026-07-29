@@ -141,6 +141,59 @@ The project is pinned in [`.firebaserc`](.firebaserc); update it to your own pro
 - Auth-only routes (`/library`, `/library/:id`) are guarded and redirect to `/login` when signed
   out.
 
+## Deployment
+
+Production runs the **frontend on Vercel** and the **backend on Render** (a long-running Node
+web service — not serverless). The two are on different origins, so the frontend calls the
+backend at `VITE_API_BASE_URL` and the backend enables CORS for the frontend origin
+(`CORS_ORIGIN`).
+
+### Backend → Render
+
+Uses [`render.yaml`](render.yaml) (Blueprint). In the Render dashboard: **New + → Blueprint**,
+point at this repo. It creates a web service with:
+
+- **Root directory:** `backend`
+- **Build:** `npm install && npm run build`
+- **Start:** `npm start` (`node dist/server.js`)
+- **Health check:** `/api/health`
+
+Set these environment variables in the Render dashboard (do **not** commit them):
+
+| Variable | Notes |
+|---|---|
+| `FETCH_AI_API_KEY` | secret |
+| `FETCH_AI_ENDPOINT_URL` | e.g. `https://api.asi1.ai/v1` |
+| `FETCH_AI_MODEL` | e.g. `asi1-mini` |
+| `GENERATION_TIMEOUT_MS`, `IDEA_MIN_LENGTH`, `IDEA_MAX_LENGTH` | defaults in `render.yaml` |
+| `FIREBASE_PROJECT_ID` | your Firebase project id |
+| `FIREBASE_SERVICE_ACCOUNT` | the service-account JSON **inlined as one string** (use this on Render; `FIREBASE_SERVICE_ACCOUNT_PATH` is for local dev) |
+| `CORS_ORIGIN` | the deployed frontend origin, e.g. `https://your-app.vercel.app` |
+
+> `PORT` is injected by Render automatically — do not set it. The server reads `process.env.PORT`.
+
+### Frontend → Vercel
+
+Uses [`frontend/vercel.json`](frontend/vercel.json) (SPA rewrite so React routes survive a
+refresh). In the Vercel dashboard: **Add New → Project**, import this repo, and set:
+
+- **Root directory:** `frontend`
+- **Build command:** `npm run build` · **Output directory:** `dist` (auto-detected via `vercel.json`)
+
+Set these environment variables:
+
+| Variable | Value |
+|---|---|
+| `VITE_API_BASE_URL` | the deployed backend URL, e.g. `https://specpilot-backend.onrender.com` |
+| `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_APP_ID` | from your Firebase Web app config |
+
+### Order & final wiring
+
+1. Deploy the backend first to get its Render URL.
+2. Deploy the frontend with `VITE_API_BASE_URL` = that Render URL.
+3. Set the backend's `CORS_ORIGIN` to the Vercel URL and redeploy the backend.
+4. Deploy the Firestore rules once: `firebase deploy --only firestore:rules`.
+
 ## Scripts
 
 Both projects expose the same scripts:

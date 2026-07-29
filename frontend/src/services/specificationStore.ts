@@ -3,11 +3,12 @@ import type {
   SavedSpecification,
   SavedSpecificationSummary,
 } from '../types/savedSpecification.types';
+import { apiUrl } from './apiBase';
 
-// Talks to the authenticated persistence endpoints (feature/firebase-auth, Phase 4b/5). Like
-// specificationApi.ts, it uses relative /api URLs so the Vite dev proxy (and same-origin
-// production) route requests without CORS. Every call carries the caller's Firebase ID token
-// as a Bearer credential; the backend verifies it and scopes all access to that user.
+// Talks to the authenticated persistence endpoints (feature/firebase-auth, Phase 4b/5). URLs
+// are built via apiUrl() — relative in dev (Vite proxy), absolute cross-origin in production
+// (VITE_API_BASE_URL → Render backend with CORS). Every call carries the caller's Firebase ID
+// token as a Bearer credential; the backend verifies it and scopes all access to that user.
 
 export interface SaveResult {
   ok: boolean;
@@ -27,7 +28,7 @@ export async function saveSpecification(
 ): Promise<SaveResult> {
   let response: Response;
   try {
-    response = await fetch('/api/me/specifications', {
+    response = await fetch(apiUrl('/api/me/specifications'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -66,7 +67,7 @@ export interface ListResult {
 export async function listSpecifications(idToken: string): Promise<ListResult> {
   let response: Response;
   try {
-    response = await fetch('/api/me/specifications', {
+    response = await fetch(apiUrl('/api/me/specifications'), {
       headers: { Authorization: `Bearer ${idToken}` },
     });
   } catch {
@@ -100,7 +101,7 @@ export interface GetResult {
 export async function getSpecification(idToken: string, id: string): Promise<GetResult> {
   let response: Response;
   try {
-    response = await fetch(`/api/me/specifications/${encodeURIComponent(id)}`, {
+    response = await fetch(apiUrl(`/api/me/specifications/${encodeURIComponent(id)}`), {
       headers: { Authorization: `Bearer ${idToken}` },
     });
   } catch {

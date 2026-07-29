@@ -8,6 +8,7 @@ import { config as loadEnv } from 'dotenv';
 loadEnv({ path: resolve(__dirname, '../.env') });
 
 import express, { type NextFunction, type Request, type Response } from 'express';
+import { cors } from './middleware/cors';
 import { specificationsRouter } from './api/specifications.route';
 import { mySpecificationsRouter } from './api/mySpecifications.route';
 import { verifyFirebaseAdmin } from './lib/firebaseAdmin';
@@ -16,6 +17,10 @@ import { verifyFirebaseAdmin } from './lib/firebaseAdmin';
 // tests (T039) can import it with Supertest without binding a port; the server only starts
 // listening when this module is run directly.
 export const app = express();
+
+// Allow the deployed frontend origin (cross-origin in production) + handle preflight. Mounted
+// first so every route — including the SSE stream and preflighted /api/me calls — gets headers.
+app.use(cors);
 
 // Idea text is at most ~2,000 chars (FR-006); a small bounded body limit is plenty.
 app.use(express.json({ limit: '64kb' }));
