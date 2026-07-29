@@ -55,6 +55,12 @@ export function Navbar() {
           {!loading &&
             (user ? (
               <>
+                <Link
+                  to="/library"
+                  className="hidden rounded-md text-sm font-medium text-slate-600 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 sm:inline"
+                >
+                  My Specifications
+                </Link>
                 <span
                   className="hidden max-w-[16ch] truncate text-sm font-medium text-slate-600 sm:inline"
                   title={user.email ?? undefined}

@@ -1,6 +1,7 @@
 import type { Specification } from '../types/specification.types';
+import type { SavedSpecificationSummary } from '../types/savedSpecification.types';
 
-// Talks to the authenticated persistence endpoints (feature/firebase-auth, Phase 4b). Like
+// Talks to the authenticated persistence endpoints (feature/firebase-auth, Phase 4b/5). Like
 // specificationApi.ts, it uses relative /api URLs so the Vite dev proxy (and same-origin
 // production) route requests without CORS. Every call carries the caller's Firebase ID token
 // as a Bearer credential; the backend verifies it and scopes all access to that user.
@@ -42,6 +43,39 @@ export async function saveSpecification(
     } catch {
       // Saved, but the response body was unreadable — still a success from the user's view.
       return { ok: true };
+    }
+  }
+  return { ok: false, error: `status_${response.status}` };
+}
+
+export interface ListResult {
+  ok: boolean;
+  specifications?: SavedSpecificationSummary[];
+  /** Machine-readable failure hint for logging; never shown to the user. */
+  error?: string;
+}
+
+/**
+ * Lists the signed-in user's saved specifications (summaries). The backend returns them
+ * newest-first; the Library page sorts defensively regardless. Returns a result object rather
+ * than throwing so the page can render an error state.
+ */
+export async function listSpecifications(idToken: string): Promise<ListResult> {
+  let response: Response;
+  try {
+    response = await fetch('/api/me/specifications', {
+      headers: { Authorization: `Bearer ${idToken}` },
+    });
+  } catch {
+    return { ok: false, error: 'network_error' };
+  }
+
+  if (response.status === 200) {
+    try {
+      const body = (await response.json()) as { specifications: SavedSpecificationSummary[] };
+      return { ok: true, specifications: body.specifications ?? [] };
+    } catch {
+      return { ok: false, error: 'bad_response' };
     }
   }
   return { ok: false, error: `status_${response.status}` };
