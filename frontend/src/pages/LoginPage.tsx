@@ -35,7 +35,12 @@ export default function LoginPage() {
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col items-center px-4 py-16 sm:px-6">
-      <AuthForm mode="login" onSubmit={handleSubmit} isSubmitting={submitting} submitError={error} />
+      <AuthForm
+        mode="login"
+        onSubmit={handleSubmit}
+        isSubmitting={submitting}
+        submitError={error}
+      />
       <p className="mt-6 text-sm text-slate-500">
         Don’t have an account?{' '}
         <Link to="/signup" className="font-medium text-brand-600 hover:text-brand-700">

@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { LogIn, UserPlus } from 'lucide-react';
+import { LogIn, UserPlus, Loader2 } from 'lucide-react';
 import { Button, Card } from '../ui';
 
 // Shared email/password form for the Login and Signup pages (feature/firebase-auth, Phase 2).
@@ -105,8 +105,18 @@ export function AuthForm({ mode, onSubmit, isSubmitting, submitError }: AuthForm
           </p>
         )}
 
-        <Button type="submit" variant="primary" size="lg" className="mt-1 w-full" disabled={isSubmitting}>
-          <Icon className="h-4 w-4" aria-hidden="true" />
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          className="mt-1 w-full"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+          ) : (
+            <Icon className="h-4 w-4" aria-hidden="true" />
+          )}
           {isSubmitting ? 'Please wait…' : copy.action}
         </Button>
       </form>

@@ -24,11 +24,7 @@ function extractBearerToken(header: string | undefined): string {
   return header.slice('Bearer '.length).trim();
 }
 
-export async function authenticate(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> {
+export async function authenticate(req: Request, res: Response, next: NextFunction): Promise<void> {
   const token = extractBearerToken(req.headers.authorization);
   if (token === '') {
     res.status(401).json({

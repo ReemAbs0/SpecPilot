@@ -35,7 +35,9 @@ const VALID_SPEC = {
   userRoles: ['Member', 'Coach'],
   functionalRequirements: ['Create habits', 'Track streaks'],
   nonFunctionalRequirements: ['Fast load times'],
-  userStories: [{ title: 'Track', narrative: 'As a Member, I want to log a habit', role: 'Member' }],
+  userStories: [
+    { title: 'Track', narrative: 'As a Member, I want to log a habit', role: 'Member' },
+  ],
   milestones: [{ name: 'MVP', description: 'Core tracking', order: 1 }],
   technicalConsiderations: ['Offline-first storage'],
 };

@@ -1,5 +1,6 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../../state/AuthContext';
+import { Spinner } from '../ui';
 
 // Route guard for authenticated-only pages (feature/firebase-auth, Phase 3). Used as a layout
 // route wrapping the protected routes (e.g. /library in Phase 5); it renders the matched child
@@ -18,8 +19,8 @@ export function RequireAuth() {
 
   if (loading) {
     return (
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6" aria-busy="true">
-        <p className="text-slate-500">Loading…</p>
+      <section className="mx-auto flex max-w-6xl justify-center px-4 py-20 sm:px-6">
+        <Spinner label="Loading…" />
       </section>
     );
   }

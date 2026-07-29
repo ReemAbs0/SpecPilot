@@ -7,7 +7,7 @@ import { getSpecification } from '../services/specificationStore';
 import { ResultHeader } from '../components/result/ResultHeader';
 import { SpecificationSections } from '../components/result/SpecificationSections';
 import { ActionsPanel } from '../components/result/ActionsPanel';
-import { Button } from '../components/ui';
+import { Button, Spinner } from '../components/ui';
 import type { SavedSpecification } from '../types/savedSpecification.types';
 
 // Saved-specification detail page (feature/firebase-auth, Phase 6). Fetches one saved record via
@@ -88,9 +88,9 @@ export default function SavedSpecificationPage() {
     return (
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <BackLink />
-        <p className="mt-8 text-slate-500" aria-busy="true">
-          Loading specification…
-        </p>
+        <div className="mt-8 flex justify-center py-12">
+          <Spinner label="Loading specification…" />
+        </div>
       </div>
     );
   }

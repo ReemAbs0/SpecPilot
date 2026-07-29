@@ -53,7 +53,9 @@ class FakeEventSource {
   }
   close() {}
   emit(type: string, data: unknown) {
-    (this.listeners[type] ?? []).forEach((cb) => cb({ data: JSON.stringify(data) } as MessageEvent));
+    (this.listeners[type] ?? []).forEach((cb) =>
+      cb({ data: JSON.stringify(data) } as MessageEvent),
+    );
   }
 }
 
@@ -84,7 +86,10 @@ async function generateOnce() {
   const user = userEvent.setup();
   render(<App />);
   const textarea = await screen.findByLabelText(/describe your software idea/i);
-  await user.type(textarea, 'A mobile app for dog walkers with booking, GPS tracking, and payments.');
+  await user.type(
+    textarea,
+    'A mobile app for dog walkers with booking, GPS tracking, and payments.',
+  );
   await user.click(screen.getByRole('button', { name: /generate specification/i }));
   await waitFor(() => expect(FakeEventSource.instances.length).toBeGreaterThan(0));
   driveSuccessfulStream();

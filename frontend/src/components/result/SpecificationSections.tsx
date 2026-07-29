@@ -1,4 +1,13 @@
-import { FileText, Target, Users, ClipboardList, Gauge, BookOpen, Milestone, Cpu } from 'lucide-react';
+import {
+  FileText,
+  Target,
+  Users,
+  ClipboardList,
+  Gauge,
+  BookOpen,
+  Milestone,
+  Cpu,
+} from 'lucide-react';
 import { SpecificationSection } from './SpecificationSection';
 import type { Specification } from '../../types/specification.types';
 
@@ -11,7 +20,11 @@ const ICON = 'h-5 w-5';
 export function SpecificationSections({ specification: spec }: { specification: Specification }) {
   return (
     <div className="flex flex-col gap-5 lg:col-span-2">
-      <SpecificationSection icon={<FileText className={ICON} />} title="Project Summary" defaultOpen>
+      <SpecificationSection
+        icon={<FileText className={ICON} />}
+        title="Project Summary"
+        defaultOpen
+      >
         <p className="leading-relaxed text-slate-600">{spec.projectSummary}</p>
       </SpecificationSection>
 

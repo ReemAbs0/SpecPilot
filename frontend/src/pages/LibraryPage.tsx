@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { FolderOpen, AlertTriangle, Sparkles } from 'lucide-react';
 import { useAuth } from '../state/AuthContext';
 import { listSpecifications } from '../services/specificationStore';
-import { Button } from '../components/ui';
+import { Button, Spinner } from '../components/ui';
 import { SpecificationCard } from '../components/library/SpecificationCard';
 import type { SavedSpecificationSummary } from '../types/savedSpecification.types';
 
@@ -73,9 +73,9 @@ export default function LibraryPage() {
 
       <div className="mt-8">
         {state.status === 'loading' && (
-          <p className="text-slate-500" aria-busy="true">
-            Loading your specifications…
-          </p>
+          <div className="flex justify-center py-16">
+            <Spinner label="Loading your specifications…" />
+          </div>
         )}
 
         {state.status === 'error' && (

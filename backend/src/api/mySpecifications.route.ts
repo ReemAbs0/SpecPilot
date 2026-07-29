@@ -77,9 +77,10 @@ mySpecificationsRouter.post('/specifications', async (req: Request, res: Respons
     return;
   }
   if (!isValidSpecification(body?.specification)) {
-    res
-      .status(422)
-      .json({ error: 'invalid_specification', message: 'The specification is missing or malformed.' });
+    res.status(422).json({
+      error: 'invalid_specification',
+      message: 'The specification is missing or malformed.',
+    });
     return;
   }
 
@@ -122,8 +123,6 @@ mySpecificationsRouter.get('/specifications/:id', async (req: Request, res: Resp
   } catch (error) {
     const name = error instanceof Error ? error.name : 'UnknownError';
     console.error(`[error] ${req.method} ${req.path}: ${name}`);
-    res
-      .status(500)
-      .json({ error: 'internal_error', message: 'Could not load the specification.' });
+    res.status(500).json({ error: 'internal_error', message: 'Could not load the specification.' });
   }
 });

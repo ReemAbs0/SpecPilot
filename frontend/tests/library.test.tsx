@@ -41,8 +41,18 @@ describe('LibraryPage', () => {
         status: 200,
         json: async () => ({
           specifications: [
-            { id: 'older', title: 'Older Spec', idea: 'an older idea', createdAt: '2026-07-01T10:00:00.000Z' },
-            { id: 'newer', title: 'Newer Spec', idea: 'a newer idea', createdAt: '2026-07-20T10:00:00.000Z' },
+            {
+              id: 'older',
+              title: 'Older Spec',
+              idea: 'an older idea',
+              createdAt: '2026-07-01T10:00:00.000Z',
+            },
+            {
+              id: 'newer',
+              title: 'Newer Spec',
+              idea: 'a newer idea',
+              createdAt: '2026-07-20T10:00:00.000Z',
+            },
           ],
         }),
       })),
