@@ -43,7 +43,7 @@ export default tseslint.config(
   {
     // Context modules idiomatically co-locate their Provider component with the access hook;
     // the fast-refresh rule doesn't apply to this intentional pattern.
-    files: ['src/state/SpecificationContext.tsx'],
+    files: ['src/state/SpecificationContext.tsx', 'src/state/AuthContext.tsx'],
     rules: {
       'react-refresh/only-export-components': 'off',
     },

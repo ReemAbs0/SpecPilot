@@ -1,19 +1,60 @@
 import { useEffect, useRef } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { AlertTriangle } from 'lucide-react';
+import type { User } from 'firebase/auth';
 import { useSpecification } from '../state/SpecificationContext';
+import { useAuth } from '../state/AuthContext';
 import { openStream, startGeneration } from '../services/specificationApi';
+import { saveSpecification } from '../services/specificationStore';
 import { Button } from '../components/ui';
 import { ProgressCard } from '../components/generating/ProgressCard';
+import type { Specification } from '../types/specification.types';
 
 // Generation progress screen (T027). Opens the SSE stream for the active session, reflects
 // stage progress, and handles success (→ result), failure/timeout (retry), and user
 // cancellation (FR-011/FR-011a/FR-011b).
+//
+// When a generation succeeds AND a user is signed in, the finished specification is persisted
+// to their account (feature/firebase-auth, Phase 4b). This is best-effort and fire-and-forget:
+// it never blocks navigation to the result and never alters the generation flow, so guests are
+// completely unaffected.
+
+/** Best-effort persistence of a just-generated specification. Swallows all errors. */
+async function persistToAccount(
+  user: User,
+  idea: string,
+  specification: Specification,
+): Promise<void> {
+  try {
+    const token = await user.getIdToken();
+    const result = await saveSpecification(token, { idea, specification });
+    if (!result.ok) {
+      console.warn(`[specpilot] could not save specification: ${result.error ?? 'unknown'}`);
+    }
+  } catch {
+    // Persistence must never surface as a generation error.
+    console.warn('[specpilot] could not save specification.');
+  }
+}
 
 export default function GeneratingPage() {
   const { state, dispatch } = useSpecification();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const closeRef = useRef<(() => void) | null>(null);
+
+  // The stream effect below must NOT depend on `user`/`ideaText` — adding them as deps could
+  // tear down and reopen the SSE stream mid-generation (which cancels the session on the
+  // backend). Refs (synced via effects) let the terminal onSucceeded handler read the current
+  // values without widening the stream effect's dependencies.
+  const userRef = useRef(user);
+  const ideaRef = useRef(state.ideaText);
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
+  useEffect(() => {
+    ideaRef.current = state.ideaText;
+  }, [state.ideaText]);
 
   // Open the progress stream while a generation is running. Stage events keep status
   // 'generating', so this effect stays stable until a terminal transition.
@@ -24,7 +65,14 @@ export default function GeneratingPage() {
     const close = openStream(state.sessionId, {
       onStageStarted: (stage) => dispatch({ type: 'STAGE_STARTED', stage }),
       onStageCompleted: (stage) => dispatch({ type: 'STAGE_COMPLETED', stage }),
-      onSucceeded: (specification) => dispatch({ type: 'SUCCEEDED', specification }),
+      onSucceeded: (specification) => {
+        dispatch({ type: 'SUCCEEDED', specification });
+        // Save to the account only when signed in; guests just see the result.
+        const currentUser = userRef.current;
+        if (currentUser) {
+          void persistToAccount(currentUser, ideaRef.current, specification);
+        }
+      },
       onFailed: (reason) => dispatch({ type: 'FAILED', reason }),
     });
     closeRef.current = close;
