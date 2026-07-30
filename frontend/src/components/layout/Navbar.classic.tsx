@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Rocket, ArrowRight } from 'lucide-react';
 import { Button } from '../ui';
 import { useAuth } from '../../state/AuthContext';
+import { useSpecification } from '../../state/SpecificationContext';
 import { UserMenu } from './UserMenu';
 import { NAV_LINKS } from './navLinks';
 
@@ -11,6 +12,7 @@ import { NAV_LINKS } from './navLinks';
 
 export function ClassicNavbar() {
   const { user, loading } = useAuth();
+  const { dispatch } = useSpecification();
 
   return (
     <header className="sticky top-0 z-10 border-b border-slate-100 dark:border-slate-800 bg-surface-muted/80 dark:bg-slate-950/80 backdrop-blur">
@@ -52,7 +54,14 @@ export function ClassicNavbar() {
               </Link>
             ))}
 
-          <Link to="/generate" aria-label="Get started — generate a specification">
+          {/* "Get Started" always begins a fresh spec, so clear any idea left over from a
+              previously generated specification (unlike the CANCEL/"Generate Again" flows,
+              which deliberately keep the idea). */}
+          <Link
+            to="/generate"
+            aria-label="Get started — generate a specification"
+            onClick={() => dispatch({ type: 'SET_IDEA', text: '' })}
+          >
             <Button variant="primary">
               Get Started
               <ArrowRight className="h-4 w-4" aria-hidden="true" />

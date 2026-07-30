@@ -7,6 +7,7 @@ import MuiButton from '@mui/material/Button';
 import Toolbar from '@mui/material/Toolbar';
 import { useTheme } from '@mui/material/styles';
 import { useAuth } from '../../state/AuthContext';
+import { useSpecification } from '../../state/SpecificationContext';
 import { UserMenu } from './UserMenu';
 import { NAV_LINKS } from './navLinks';
 
@@ -19,6 +20,7 @@ import { NAV_LINKS } from './navLinks';
 
 export function MaterialNavbar() {
   const { user, loading } = useAuth();
+  const { dispatch } = useSpecification();
   const isDark = useTheme().palette.mode === 'dark';
   // Foreground for items sitting directly on the bar: white on the indigo (light) bar, standard
   // primary text on the dark bar.
@@ -90,6 +92,10 @@ export function MaterialNavbar() {
             component={RouterLink}
             to="/generate"
             aria-label="Get started — generate a specification"
+            // "Get Started" always begins a fresh spec, so clear any idea left over from a
+            // previously generated specification (unlike the CANCEL/"Generate Again" flows,
+            // which deliberately keep the idea).
+            onClick={() => dispatch({ type: 'SET_IDEA', text: '' })}
             variant="contained"
             endIcon={<ArrowRight className="h-4 w-4" aria-hidden="true" />}
             sx={{
