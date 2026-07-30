@@ -5,7 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { AuthProvider } from './state/AuthContext';
 import { SpecificationProvider } from './state/SpecificationContext';
 import { ThemeModeProvider, useThemeMode } from './state/ThemeContext';
-import { muiTheme } from './lib/muiTheme';
+import { muiTheme, muiThemeDark } from './lib/muiTheme';
 import { Navbar } from './components/layout/Navbar';
 import LandingPage from './pages/LandingPage';
 import GeneratorPage from './pages/GeneratorPage';
@@ -48,9 +48,14 @@ function NotFound() {
 // which resets/normalizes global styles — is applied ONLY in Material mode so the Classic
 // Tailwind UI keeps its original global styling untouched.
 function ThemeShell({ children }: { children: ReactNode }) {
-  const { mode } = useThemeMode();
+  const { mode, colorMode } = useThemeMode();
+  // Colour mode is independent of the design system: swap to the dark MUI palette when dark is
+  // selected. The MUI ThemeProvider is always mounted (inert for Classic markup); CssBaseline —
+  // which resets globals and paints the theme background — is applied ONLY in Material mode so the
+  // Classic Tailwind UI keeps its own global styling (its dark surfaces come from Tailwind).
+  const activeMuiTheme = colorMode === 'dark' ? muiThemeDark : muiTheme;
   return (
-    <MuiThemeProvider theme={muiTheme}>
+    <MuiThemeProvider theme={activeMuiTheme}>
       {mode === 'material' && <CssBaseline />}
       {children}
     </MuiThemeProvider>

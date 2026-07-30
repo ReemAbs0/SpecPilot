@@ -4,6 +4,7 @@ import { ChevronDown, FolderOpen, LogOut } from 'lucide-react';
 import { cn } from '../ui';
 import { useUserMenu } from './userMenu.shared';
 import { ThemeSwitcher } from './ThemeSwitcher';
+import { ColorModeToggle } from './ColorModeToggle';
 
 // Classic (Tailwind) profile menu — the original custom dropdown, unchanged in look and
 // behaviour. A single profile button opens a dropdown with the account actions. Auth wiring lives
@@ -113,6 +114,13 @@ export function ClassicUserMenu() {
         <div className="px-3 py-1">
           <p className="pb-1.5 text-xs font-medium text-slate-500">Theme</p>
           <ThemeSwitcher tabIndex={open ? 0 : -1} />
+        </div>
+
+        <hr className="my-1.5 border-slate-100" />
+
+        <div className="px-3 py-1">
+          <p className="pb-1.5 text-xs font-medium text-slate-500">Appearance</p>
+          <ColorModeToggle tabIndex={open ? 0 : -1} />
         </div>
 
         <hr className="my-1.5 border-slate-100" />

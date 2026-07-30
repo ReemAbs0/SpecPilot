@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  color-scheme: light;
-}
-
 html,
 body,
 #root {
@@ -15,4 +11,12 @@ body,
 body {
   margin: 0;
   @apply bg-surface-muted text-slate-800 font-sans antialiased;
+}
+
+/* Dark mode (feature/dark-mode): the page background/text for the Classic design system. Keyed
+   off the `.dark` class ThemeModeProvider sets on <html>. Material mode paints its own background
+   via MUI CssBaseline, so this base is harmless there. `color-scheme` is set inline by the
+   provider so native controls/scrollbars follow the theme even before this rule applies. */
+html.dark body {
+  @apply bg-slate-950 text-slate-200;
 }

@@ -11,6 +11,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import { useUserMenu } from './userMenu.shared';
 import { ThemeSwitcher } from './ThemeSwitcher';
+import { ColorModeToggle } from './ColorModeToggle';
 
 // Material (MUI) profile menu. Same account actions and behaviour as the Classic dropdown, built
 // from MUI's Avatar / Menu / MenuItem. Auth wiring is shared via useUserMenu, so only the
@@ -119,6 +120,18 @@ export function MaterialUserMenu() {
             Theme
           </Typography>
           <ThemeSwitcher />
+        </Box>
+
+        <Divider />
+
+        <Box sx={{ px: 2, py: 1 }}>
+          <Typography
+            variant="caption"
+            sx={{ display: 'block', color: 'text.secondary', pb: 0.75 }}
+          >
+            Appearance
+          </Typography>
+          <ColorModeToggle />
         </Box>
 
         <Divider />
