@@ -1,6 +1,11 @@
+import { type ReactNode } from 'react';
 import { BrowserRouter, Routes, Route, Outlet, Link } from 'react-router-dom';
+import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 import { AuthProvider } from './state/AuthContext';
 import { SpecificationProvider } from './state/SpecificationContext';
+import { ThemeModeProvider, useThemeMode } from './state/ThemeContext';
+import { muiTheme } from './lib/muiTheme';
 import { Navbar } from './components/layout/Navbar';
 import LandingPage from './pages/LandingPage';
 import GeneratorPage from './pages/GeneratorPage';
@@ -38,11 +43,27 @@ function NotFound() {
   );
 }
 
+// Makes the MUI theme available to every Material-mode component. The MUI ThemeProvider is
+// always mounted (it only supplies context and is inert for Classic markup), but CssBaseline —
+// which resets/normalizes global styles — is applied ONLY in Material mode so the Classic
+// Tailwind UI keeps its original global styling untouched.
+function ThemeShell({ children }: { children: ReactNode }) {
+  const { mode } = useThemeMode();
+  return (
+    <MuiThemeProvider theme={muiTheme}>
+      {mode === 'material' && <CssBaseline />}
+      {children}
+    </MuiThemeProvider>
+  );
+}
+
 export default function App() {
   return (
-    <AuthProvider>
-      <SpecificationProvider>
-        <BrowserRouter>
+    <ThemeModeProvider>
+      <ThemeShell>
+        <AuthProvider>
+          <SpecificationProvider>
+            <BrowserRouter>
           <Routes>
             <Route element={<AppLayout />}>
               <Route index element={<LandingPage />} />
@@ -58,8 +79,10 @@ export default function App() {
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
-        </BrowserRouter>
-      </SpecificationProvider>
-    </AuthProvider>
+            </BrowserRouter>
+          </SpecificationProvider>
+        </AuthProvider>
+      </ThemeShell>
+    </ThemeModeProvider>
   );
 }
