@@ -61,11 +61,17 @@ export function ThemeModeProvider({ children }: { children: ReactNode }) {
   return <ThemeModeContext.Provider value={value}>{children}</ThemeModeContext.Provider>;
 }
 
-/** Access the active UI theme mode. Must be used within a ThemeModeProvider. */
+// Used when a component that reads the theme is rendered outside a ThemeModeProvider (e.g. an
+// isolated component test). Since Classic is the app's default theme, falling back to it keeps
+// the shared primitives usable anywhere; the setters are no-ops because there is no provider
+// state to update.
+const FALLBACK: ThemeModeContextValue = {
+  mode: DEFAULT_MODE,
+  setMode: () => {},
+  toggle: () => {},
+};
+
+/** Access the active UI theme mode. Falls back to the default Classic mode outside a provider. */
 export function useThemeMode(): ThemeModeContextValue {
-  const context = useContext(ThemeModeContext);
-  if (context === undefined) {
-    throw new Error('useThemeMode must be used within a ThemeModeProvider');
-  }
-  return context;
+  return useContext(ThemeModeContext) ?? FALLBACK;
 }
