@@ -38,8 +38,14 @@ export function useUserMenu(): UserMenuState {
     location.pathname === '/library' || location.pathname.startsWith('/library/');
 
   async function signOutAndGoHome() {
+    // Navigate home BEFORE signing out. If we sign out first, RequireAuth is still mounted on
+    // the protected page when `user` flips to null, so it redirects to /login and records this
+    // page in location.state.from — which would bounce the user back here on the next sign-in.
+    // Going home first (replacing history so the private page isn't preserved) unmounts
+    // RequireAuth, so no `from` is captured on an explicit logout. The normal guard redirect
+    // (accessing a protected route while logged out) is unaffected.
+    navigate('/', { replace: true });
     await signOut();
-    navigate('/');
   }
 
   return { user, label, initial, onLibrary, signOutAndGoHome };
