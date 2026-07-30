@@ -14,7 +14,9 @@ const base =
 
 const variants: Record<ButtonVariant, string> = {
   primary: 'bg-brand-600 text-white hover:bg-brand-700',
-  secondary: 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50',
+  secondary:
+    'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 ' +
+    'dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700',
 };
 
 const sizes: Record<ButtonSize, string> = {

@@ -37,7 +37,7 @@ function BackLink() {
   return (
     <Link
       to="/library"
-      className="inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-brand-600 hover:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+      className="inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
     >
       <ArrowLeft className="h-4 w-4" aria-hidden="true" />
       Back to My Specifications
@@ -98,11 +98,11 @@ export default function SavedSpecificationPage() {
   if (state.status === 'notfound') {
     return (
       <div className="mx-auto flex max-w-xl flex-col items-center px-4 py-20 text-center sm:px-6">
-        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
-          <FileQuestion className="h-7 w-7 text-slate-500" aria-hidden="true" />
+        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+          <FileQuestion className="h-7 w-7 text-slate-500 dark:text-slate-400" aria-hidden="true" />
         </span>
-        <h1 className="mt-5 text-2xl font-bold text-slate-900">Specification not found</h1>
-        <p className="mt-2 text-slate-500">
+        <h1 className="mt-5 text-2xl font-bold text-slate-900 dark:text-slate-100">Specification not found</h1>
+        <p className="mt-2 text-slate-500 dark:text-slate-400">
           This specification doesn’t exist or isn’t in your account.
         </p>
         <Link to="/library" className="mt-6">
@@ -115,11 +115,11 @@ export default function SavedSpecificationPage() {
   if (state.status === 'error') {
     return (
       <div className="mx-auto flex max-w-xl flex-col items-center px-4 py-20 text-center sm:px-6">
-        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-red-50">
-          <AlertTriangle className="h-7 w-7 text-red-500" aria-hidden="true" />
+        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-red-50 dark:bg-red-500/10">
+          <AlertTriangle className="h-7 w-7 text-red-500 dark:text-red-400" aria-hidden="true" />
         </span>
-        <h1 className="mt-5 text-2xl font-bold text-slate-900">Couldn’t load specification</h1>
-        <p className="mt-2 text-slate-500" role="alert">
+        <h1 className="mt-5 text-2xl font-bold text-slate-900 dark:text-slate-100">Couldn’t load specification</h1>
+        <p className="mt-2 text-slate-500 dark:text-slate-400" role="alert">
           Something went wrong loading this specification. Please try again.
         </p>
         <div className="mt-6 flex items-center gap-3">

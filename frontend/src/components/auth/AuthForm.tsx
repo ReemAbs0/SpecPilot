@@ -58,9 +58,9 @@ export function AuthForm({ mode, onSubmit, isSubmitting, submitError }: AuthForm
 
   return (
     <Card className="w-full max-w-md p-0">
-      <div className="border-b border-slate-100 px-6 py-5">
-        <h1 className="text-xl font-bold text-slate-900">{copy.title}</h1>
-        <p className="mt-1 text-sm text-slate-500">{copy.subtitle}</p>
+      <div className="border-b border-slate-100 dark:border-slate-800 px-6 py-5">
+        <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">{copy.title}</h1>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{copy.subtitle}</p>
       </div>
 
       <form className="flex flex-col gap-4 px-6 py-6" onSubmit={handleSubmit} noValidate>
@@ -90,7 +90,7 @@ export function AuthForm({ mode, onSubmit, isSubmitting, submitError }: AuthForm
         />
 
         {error && (
-          <p id="auth-error" role="alert" className="text-sm text-red-600">
+          <p id="auth-error" role="alert" className="text-sm text-red-600 dark:text-red-400">
             {error}
           </p>
         )}

@@ -66,8 +66,8 @@ export default function LibraryPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
-      <h1 className="text-3xl font-bold text-slate-900">My Specifications</h1>
-      <p className="mt-2 text-slate-500">
+      <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">My Specifications</h1>
+      <p className="mt-2 text-slate-500 dark:text-slate-400">
         Every specification you generate while signed in is saved here.
       </p>
 
@@ -80,13 +80,13 @@ export default function LibraryPage() {
 
         {state.status === 'error' && (
           <Surface
-            surface="rounded-2xl border border-slate-100 bg-white shadow-card"
+            surface="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-card"
             className="flex flex-col items-center p-10 text-center"
           >
-            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-red-50">
-              <AlertTriangle className="h-6 w-6 text-red-500" aria-hidden="true" />
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-red-50 dark:bg-red-500/10">
+              <AlertTriangle className="h-6 w-6 text-red-500 dark:text-red-400" aria-hidden="true" />
             </span>
-            <p className="mt-4 text-slate-600" role="alert">
+            <p className="mt-4 text-slate-600 dark:text-slate-300" role="alert">
               We couldn’t load your specifications. Please try again.
             </p>
             <Button variant="secondary" className="mt-4" onClick={() => window.location.reload()}>
@@ -97,14 +97,14 @@ export default function LibraryPage() {
 
         {state.status === 'ready' && state.specifications.length === 0 && (
           <Surface
-            surface="rounded-2xl border border-slate-100 bg-white shadow-card"
+            surface="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-card"
             className="flex flex-col items-center p-12 text-center"
           >
-            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-50">
-              <FolderOpen className="h-6 w-6 text-brand-600" aria-hidden="true" />
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-50 dark:bg-brand-500/10">
+              <FolderOpen className="h-6 w-6 text-brand-600 dark:text-brand-400" aria-hidden="true" />
             </span>
-            <h2 className="mt-4 text-lg font-semibold text-slate-900">No specifications yet</h2>
-            <p className="mt-1 max-w-sm text-slate-500">
+            <h2 className="mt-4 text-lg font-semibold text-slate-900 dark:text-slate-100">No specifications yet</h2>
+            <p className="mt-1 max-w-sm text-slate-500 dark:text-slate-400">
               Generate your first specification and it will automatically be saved to your account.
             </p>
             <Link to="/generate" className="mt-5">

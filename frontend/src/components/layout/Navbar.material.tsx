@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import MuiButton from '@mui/material/Button';
 import Toolbar from '@mui/material/Toolbar';
+import { useTheme } from '@mui/material/styles';
 import { useAuth } from '../../state/AuthContext';
 import { UserMenu } from './UserMenu';
 import { NAV_LINKS } from './navLinks';
@@ -12,13 +13,28 @@ import { NAV_LINKS } from './navLinks';
 // Material (MUI) top navigation. A coloured, elevated MUI AppBar — the clearest signal that the
 // Material theme is active (vs the Classic flat, bordered, near-white header). Same content and
 // routing as the Classic navbar; the profile menu (with the theme switcher) reuses the shared
-// theme-aware UserMenu. Controls use light-on-primary colours so they read on the indigo bar.
+// theme-aware UserMenu. In light mode the bar is indigo and controls use light-on-primary
+// colours; in dark mode the bar becomes a dark surface (background.paper) and controls switch to
+// standard readable text tokens, so nothing relies on hardcoded light colours.
 
 export function MaterialNavbar() {
   const { user, loading } = useAuth();
+  const isDark = useTheme().palette.mode === 'dark';
+  // Foreground for items sitting directly on the bar: white on the indigo (light) bar, standard
+  // primary text on the dark bar.
+  const barForeground = isDark ? 'text.primary' : 'primary.contrastText';
 
   return (
-    <AppBar position="sticky" elevation={4} color="primary">
+    <AppBar
+      position="sticky"
+      elevation={4}
+      color="primary"
+      sx={{
+        bgcolor: isDark ? 'background.paper' : 'primary.main',
+        color: barForeground,
+        backgroundImage: 'none',
+      }}
+    >
       <Container maxWidth="lg">
         <Toolbar disableGutters sx={{ gap: 2, minHeight: { xs: 64, sm: 64 } }}>
           <Box
@@ -30,7 +46,7 @@ export function MaterialNavbar() {
               alignItems: 'center',
               gap: 1,
               textDecoration: 'none',
-              color: 'primary.contrastText',
+              color: barForeground,
             }}
           >
             <Rocket className="h-6 w-6" aria-hidden="true" />
@@ -44,7 +60,7 @@ export function MaterialNavbar() {
               <MuiButton
                 key={link.label}
                 href={link.href}
-                sx={{ color: 'primary.contrastText', opacity: 0.85, '&:hover': { opacity: 1 } }}
+                sx={{ color: barForeground, opacity: 0.85, '&:hover': { opacity: 1 } }}
               >
                 {link.label}
               </MuiButton>
@@ -62,13 +78,14 @@ export function MaterialNavbar() {
               <MuiButton
                 component={RouterLink}
                 to="/login"
-                sx={{ color: 'primary.contrastText', opacity: 0.9, '&:hover': { opacity: 1 } }}
+                sx={{ color: barForeground, opacity: 0.9, '&:hover': { opacity: 1 } }}
               >
                 Log in
               </MuiButton>
             ))}
 
-          {/* Contrasting white CTA so it stands out on the indigo AppBar. */}
+          {/* A contrasting CTA that stands out on the bar: a white button on the indigo (light)
+              bar, and a filled indigo button on the dark bar. */}
           <MuiButton
             component={RouterLink}
             to="/generate"
@@ -76,10 +93,10 @@ export function MaterialNavbar() {
             variant="contained"
             endIcon={<ArrowRight className="h-4 w-4" aria-hidden="true" />}
             sx={{
-              bgcolor: 'common.white',
-              color: 'primary.main',
+              bgcolor: isDark ? 'primary.main' : 'common.white',
+              color: isDark ? 'primary.contrastText' : 'primary.main',
               boxShadow: 'none',
-              '&:hover': { bgcolor: 'grey.100', boxShadow: 'none' },
+              '&:hover': { bgcolor: isDark ? 'primary.dark' : 'grey.100', boxShadow: 'none' },
             }}
           >
             Get Started

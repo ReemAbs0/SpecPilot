@@ -51,7 +51,7 @@ export function ThemeSwitcher({ tabIndex = 0 }: ThemeSwitcherProps = {}) {
     <div
       role="group"
       aria-label="Theme"
-      className="inline-flex items-center rounded-full border border-slate-200 bg-white p-0.5 text-xs font-medium"
+      className="inline-flex items-center rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-0.5 text-xs font-medium"
     >
       {OPTIONS.map((option) => {
         const active = mode === option.value;
@@ -64,7 +64,7 @@ export function ThemeSwitcher({ tabIndex = 0 }: ThemeSwitcherProps = {}) {
             aria-pressed={active}
             className={cn(
               'rounded-full px-2.5 py-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500',
-              active ? 'bg-brand-600 text-white' : 'text-slate-600 hover:text-slate-900',
+              active ? 'bg-brand-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white',
             )}
           >
             {option.label}
