@@ -33,3 +33,4 @@ Thumbs.db
 *.swp
 
 backend/firebase-service-account.json
+.DS_Store
