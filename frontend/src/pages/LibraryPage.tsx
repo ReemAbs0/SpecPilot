@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { FolderOpen, AlertTriangle, Sparkles } from 'lucide-react';
 import { useAuth } from '../state/AuthContext';
 import { listSpecifications } from '../services/specificationStore';
-import { Button, Spinner } from '../components/ui';
+import { Button, Spinner, Surface } from '../components/ui';
 import { SpecificationCard } from '../components/library/SpecificationCard';
 import type { SavedSpecificationSummary } from '../types/savedSpecification.types';
 
@@ -79,7 +79,10 @@ export default function LibraryPage() {
         )}
 
         {state.status === 'error' && (
-          <div className="flex flex-col items-center rounded-2xl border border-slate-100 bg-white p-10 text-center shadow-card">
+          <Surface
+            surface="rounded-2xl border border-slate-100 bg-white shadow-card"
+            className="flex flex-col items-center p-10 text-center"
+          >
             <span className="flex h-14 w-14 items-center justify-center rounded-full bg-red-50">
               <AlertTriangle className="h-6 w-6 text-red-500" aria-hidden="true" />
             </span>
@@ -89,11 +92,14 @@ export default function LibraryPage() {
             <Button variant="secondary" className="mt-4" onClick={() => window.location.reload()}>
               Retry
             </Button>
-          </div>
+          </Surface>
         )}
 
         {state.status === 'ready' && state.specifications.length === 0 && (
-          <div className="flex flex-col items-center rounded-2xl border border-slate-100 bg-white p-12 text-center shadow-card">
+          <Surface
+            surface="rounded-2xl border border-slate-100 bg-white shadow-card"
+            className="flex flex-col items-center p-12 text-center"
+          >
             <span className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-50">
               <FolderOpen className="h-6 w-6 text-brand-600" aria-hidden="true" />
             </span>
@@ -107,7 +113,7 @@ export default function LibraryPage() {
                 Generate a Specification
               </Button>
             </Link>
-          </div>
+          </Surface>
         )}
 
         {state.status === 'ready' && state.specifications.length > 0 && (

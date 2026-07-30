@@ -4,6 +4,7 @@ import {
   GENERATION_STAGE_LABELS,
   type GenerationStage,
 } from '../../types/specification.types';
+import { Surface } from '../ui';
 import { StageListItem, type StageStatus } from './StageListItem';
 import { ProgressBar } from './ProgressBar';
 
@@ -29,7 +30,7 @@ export function ProgressCard({ activeStage, completedStages }: ProgressCardProps
   const progress = completedStages.length / GENERATION_STAGES.length;
 
   return (
-    <div className="rounded-2xl bg-white p-8 shadow-card">
+    <Surface surface="rounded-2xl bg-white shadow-card" className="p-8" elevation={4}>
       <div className="flex flex-col items-center text-center">
         <span className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-100">
           <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-600">
@@ -55,6 +56,6 @@ export function ProgressCard({ activeStage, completedStages }: ProgressCardProps
       <div className="mt-8">
         <ProgressBar value={progress} />
       </div>
-    </div>
+    </Surface>
   );
 }

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Mic, Sparkles } from 'lucide-react';
-import { Badge, Button, Card } from '../ui';
+import { Badge, Button, Card, TextField } from '../ui';
 
 // Idea input form (T023). Client-side validation mirrors the backend bounds (FR-005/FR-006);
 // the form is disabled while a submission is in flight so the idea cannot be edited or
@@ -57,19 +57,19 @@ export function IdeaForm({ value, onChange, onSubmit, isSubmitting, submitError 
       </div>
 
       <div className="px-6 pt-4">
-        <label htmlFor="idea" className="sr-only">
-          Describe your software idea
-        </label>
-        <textarea
+        <TextField
           id="idea"
+          label="Describe your software idea"
+          labelHidden
+          appearance="plain"
+          multiline
+          rows={12}
           value={value}
           onChange={(event) => onChange(event.target.value)}
           placeholder={PLACEHOLDER}
           disabled={isSubmitting}
-          rows={12}
-          aria-invalid={error ? true : undefined}
-          aria-describedby={error ? 'idea-error' : undefined}
-          className="w-full resize-y rounded-xl border-0 bg-transparent text-slate-700 placeholder:text-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:opacity-60"
+          invalid={error ? true : undefined}
+          describedBy={error ? 'idea-error' : undefined}
         />
         <div className="flex items-center justify-end pb-1">
           <span

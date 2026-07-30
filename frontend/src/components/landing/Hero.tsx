@@ -1,15 +1,17 @@
 import { Link } from 'react-router-dom';
 import { Sparkles } from 'lucide-react';
-import { Button } from '../ui';
+import { Button, Surface } from '../ui';
 
 // Landing hero (T030). Headline, subtext, primary/secondary CTAs, and a decorative browser
 // mockup — matching the approved landing design. Reuses the shared Button primitive.
 
 function HeroMockup() {
   return (
-    <div
+    <Surface
       aria-hidden="true"
-      className="mx-auto mt-4 max-w-4xl overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-card"
+      elevation={6}
+      surface="rounded-2xl border border-slate-100 bg-white shadow-card"
+      className="mx-auto mt-4 max-w-4xl overflow-hidden"
     >
       <div className="flex items-center gap-1.5 border-b border-slate-100 px-4 py-3">
         <span className="h-2.5 w-2.5 rounded-full bg-slate-200" />
@@ -33,7 +35,7 @@ function HeroMockup() {
           </div>
         </div>
       </div>
-    </div>
+    </Surface>
   );
 }
 

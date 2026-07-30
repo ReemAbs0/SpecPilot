@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { LogIn, UserPlus, Loader2 } from 'lucide-react';
-import { Button, Card } from '../ui';
+import { Button, Card, TextField } from '../ui';
 
 // Shared email/password form for the Login and Signup pages (feature/firebase-auth, Phase 2).
 // Presentational: it owns only local field state + lightweight client validation, and hands
@@ -64,40 +64,30 @@ export function AuthForm({ mode, onSubmit, isSubmitting, submitError }: AuthForm
       </div>
 
       <form className="flex flex-col gap-4 px-6 py-6" onSubmit={handleSubmit} noValidate>
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="email" className="text-sm font-medium text-slate-700">
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            disabled={isSubmitting}
-            aria-invalid={error ? true : undefined}
-            className="rounded-xl border border-slate-200 px-3 py-2 text-slate-700 placeholder:text-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:opacity-60"
-            placeholder="you@example.com"
-          />
-        </div>
+        <TextField
+          id="email"
+          label="Email"
+          type="email"
+          autoComplete="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          disabled={isSubmitting}
+          invalid={error ? true : undefined}
+          placeholder="you@example.com"
+        />
 
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="password" className="text-sm font-medium text-slate-700">
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            disabled={isSubmitting}
-            aria-invalid={error ? true : undefined}
-            aria-describedby={error ? 'auth-error' : undefined}
-            className="rounded-xl border border-slate-200 px-3 py-2 text-slate-700 placeholder:text-slate-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:opacity-60"
-            placeholder={mode === 'signup' ? 'At least 6 characters' : 'Your password'}
-          />
-        </div>
+        <TextField
+          id="password"
+          label="Password"
+          type="password"
+          autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          disabled={isSubmitting}
+          invalid={error ? true : undefined}
+          describedBy={error ? 'auth-error' : undefined}
+          placeholder={mode === 'signup' ? 'At least 6 characters' : 'Your password'}
+        />
 
         {error && (
           <p id="auth-error" role="alert" className="text-sm text-red-600">
