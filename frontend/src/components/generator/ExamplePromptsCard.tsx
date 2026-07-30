@@ -1,5 +1,5 @@
 import { Bot } from 'lucide-react';
-import { Card } from '../ui';
+import { Card, Surface } from '../ui';
 
 // Example prompts sidebar card (T024). Clicking an example prefills the idea textarea via
 // the onSelect callback so users can start from a worked example.
@@ -44,16 +44,19 @@ export function ExamplePromptsCard({ onSelect, disabled }: ExamplePromptsCardPro
       </div>
       <div className="mt-4 space-y-3">
         {EXAMPLES.map((example) => (
-          <button
+          <Surface
+            as="button"
             key={example.title}
             type="button"
             onClick={() => onSelect(example.prompt)}
             disabled={disabled}
-            className="w-full rounded-xl border border-slate-200 p-3 text-left transition-colors hover:border-brand-300 hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:opacity-60"
+            elevation={1}
+            surface="rounded-xl border border-slate-200"
+            className="w-full p-3 text-left transition-colors hover:border-brand-300 hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:opacity-60"
           >
             <p className="text-sm font-semibold text-slate-900">{example.title}</p>
             <p className="mt-1 text-sm text-slate-500">{example.preview}</p>
-          </button>
+          </Surface>
         ))}
       </div>
     </Card>

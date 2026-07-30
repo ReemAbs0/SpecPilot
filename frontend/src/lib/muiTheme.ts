@@ -1,9 +1,10 @@
 import { createTheme } from '@mui/material/styles';
 
-// Material UI theme for the 'material' design mode (feature/material-theme). It mirrors the
-// existing brand tokens from tailwind.config.ts (indigo/violet primary, Inter typeface, soft
-// rounded surfaces) so the Material theme stays on-brand and visually consistent with Classic
-// rather than defaulting to MUI's stock blue. Only Material-mode components consume this.
+// Material UI theme for the 'material' design mode (feature/material-theme). It keeps the brand
+// palette (indigo/violet primary, Inter typeface) so the app stays on-brand, but deliberately
+// leans into Material's own visual language — rounded surfaces, real elevation/shadows, ripples,
+// and a coloured AppBar — so the Material theme is immediately recognisable and clearly distinct
+// from the flat, bordered Classic (Tailwind) look. Only Material-mode components consume this.
 export const muiTheme = createTheme({
   palette: {
     mode: 'light',
@@ -13,9 +14,12 @@ export const muiTheme = createTheme({
       dark: '#4338ca', // brand-700
       contrastText: '#ffffff',
     },
+    secondary: {
+      main: '#7c3aed',
+    },
     background: {
-      default: '#f6f7fb', // surface.muted
-      paper: '#ffffff', // surface.DEFAULT
+      default: '#eef0f8', // a touch cooler than Classic's surface so the page reads differently
+      paper: '#ffffff',
     },
     text: {
       primary: '#1e293b', // slate-800
@@ -34,16 +38,52 @@ export const muiTheme = createTheme({
       'Arial',
       'sans-serif',
     ].join(','),
+    button: { fontWeight: 600 },
+    h1: { fontWeight: 800 },
+    h2: { fontWeight: 800 },
+    h3: { fontWeight: 700 },
   },
   shape: {
-    // Matches the rounded-xl / rounded-2xl surfaces used throughout the Classic UI.
-    borderRadius: 12,
+    // Rounder than the Classic surfaces, a recognisable Material 3 cue.
+    borderRadius: 14,
   },
   components: {
     MuiButton: {
-      defaultProps: { disableElevation: true },
+      defaultProps: { disableElevation: false },
       styleOverrides: {
-        root: { textTransform: 'none', fontWeight: 600 },
+        root: {
+          textTransform: 'none',
+          fontWeight: 600,
+          borderRadius: 10,
+          // A stronger, coloured shadow so filled primary buttons read as elevated Material.
+          '&.MuiButton-containedPrimary': {
+            boxShadow: '0 6px 16px rgba(79, 70, 229, 0.30)',
+            '&:hover': { boxShadow: '0 8px 20px rgba(79, 70, 229, 0.38)' },
+          },
+        },
+        sizeLarge: { paddingTop: 12, paddingBottom: 12, paddingLeft: 22, paddingRight: 22 },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        // MUI paints an overlay gradient on elevated paper in dark mode; disabling it keeps our
+        // surfaces clean and predictable.
+        root: { backgroundImage: 'none' },
+      },
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: { backgroundImage: 'none' },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: { borderRadius: 12 },
+      },
+    },
+    MuiToggleButtonGroup: {
+      styleOverrides: {
+        root: { backgroundColor: '#ffffff' },
       },
     },
   },

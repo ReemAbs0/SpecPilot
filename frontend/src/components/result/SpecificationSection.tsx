@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { Surface } from '../ui';
 
 // A collapsible specification section card (T028), matching the accordion cards in the
 // approved result design. Built on a native <details> element so it is keyboard-accessible
@@ -19,9 +20,11 @@ export function SpecificationSection({
   children,
 }: SpecificationSectionProps) {
   return (
-    <details
+    <Surface
+      as="details"
       open={defaultOpen}
-      className="group rounded-2xl border border-slate-100 bg-white shadow-card"
+      surface="rounded-2xl border border-slate-100 bg-white shadow-card"
+      className="group"
     >
       <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-6 py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 [&::-webkit-details-marker]:hidden">
         <span className="flex items-center gap-2">
@@ -36,6 +39,6 @@ export function SpecificationSection({
         />
       </summary>
       <div className="border-t border-slate-100 px-6 py-5">{children}</div>
-    </details>
+    </Surface>
   );
 }
