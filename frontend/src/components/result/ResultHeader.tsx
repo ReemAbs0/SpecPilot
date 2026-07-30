@@ -19,13 +19,13 @@ export function ResultHeader({ title, timestamp }: ResultHeaderProps) {
             <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
             Generated Successfully
           </Badge>
-          <span className="text-sm font-medium text-slate-500">{timestamp}</span>
+          <span className="text-sm font-medium text-slate-500 dark:text-slate-400">{timestamp}</span>
         </div>
-        <h1 className="mt-3 text-3xl font-bold text-slate-900">{title}</h1>
+        <h1 className="mt-3 text-3xl font-bold text-slate-900 dark:text-slate-100">{title}</h1>
       </div>
       <span
         aria-hidden="true"
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-400"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500"
       >
         <Pencil className="h-4 w-4" />
       </span>

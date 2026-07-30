@@ -66,7 +66,7 @@ export function ActionsPanel({ specification }: { specification: Specification }
 
   return (
     <Card>
-      <h2 className="text-xl font-bold text-slate-900">Actions</h2>
+      <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Actions</h2>
 
       <div className="mt-5 flex flex-col gap-3">
         <Button variant="primary" className="w-full" onClick={handleDownload}>
@@ -83,9 +83,9 @@ export function ActionsPanel({ specification }: { specification: Specification }
         </Button>
       </div>
 
-      <hr className="my-6 border-slate-100" />
+      <hr className="my-6 border-slate-100 dark:border-slate-800" />
 
-      <p className="text-sm text-slate-500">Need adjustments to the scope or tone?</p>
+      <p className="text-sm text-slate-500 dark:text-slate-400">Need adjustments to the scope or tone?</p>
       <Button
         variant="secondary"
         className="mt-3 w-full"

@@ -35,8 +35,8 @@ function AppLayout() {
 function NotFound() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-      <h1 className="text-2xl font-bold text-slate-900">Page not found</h1>
-      <Link to="/" className="mt-2 inline-block text-brand-600 hover:text-brand-700">
+      <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Page not found</h1>
+      <Link to="/" className="mt-2 inline-block text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300">
         Go back home
       </Link>
     </section>

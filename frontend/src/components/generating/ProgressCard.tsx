@@ -30,15 +30,15 @@ export function ProgressCard({ activeStage, completedStages }: ProgressCardProps
   const progress = completedStages.length / GENERATION_STAGES.length;
 
   return (
-    <Surface surface="rounded-2xl bg-white shadow-card" className="p-8" elevation={4}>
+    <Surface surface="rounded-2xl bg-white dark:bg-slate-900 shadow-card" className="p-8" elevation={4}>
       <div className="flex flex-col items-center text-center">
-        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-100">
+        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-500/20">
           <span className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-600">
             <Bot className="h-6 w-6 text-white" aria-hidden="true" />
           </span>
         </span>
-        <h1 className="mt-5 text-2xl font-bold text-slate-900">Generating your Specification…</h1>
-        <p className="mt-2 text-slate-500">
+        <h1 className="mt-5 text-2xl font-bold text-slate-900 dark:text-slate-100">Generating your Specification…</h1>
+        <p className="mt-2 text-slate-500 dark:text-slate-400">
           Fetch AI Agent is analyzing your project requirements.
         </p>
       </div>

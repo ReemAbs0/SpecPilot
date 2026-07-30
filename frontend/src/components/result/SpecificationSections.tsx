@@ -25,15 +25,15 @@ export function SpecificationSections({ specification: spec }: { specification: 
         title="Project Summary"
         defaultOpen
       >
-        <p className="leading-relaxed text-slate-600">{spec.projectSummary}</p>
+        <p className="leading-relaxed text-slate-600 dark:text-slate-300">{spec.projectSummary}</p>
       </SpecificationSection>
 
       <SpecificationSection icon={<Target className={ICON} />} title="Target Users" defaultOpen>
-        <div className="rounded-xl bg-surface-lavender p-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <div className="rounded-xl bg-surface-lavender dark:bg-slate-900 p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
             Target Audience
           </p>
-          <p className="mt-1 text-slate-700">{spec.targetUsers}</p>
+          <p className="mt-1 text-slate-700 dark:text-slate-200">{spec.targetUsers}</p>
         </div>
       </SpecificationSection>
 
@@ -42,7 +42,7 @@ export function SpecificationSections({ specification: spec }: { specification: 
           {spec.userRoles.map((role) => (
             <li
               key={role}
-              className="rounded-full bg-brand-50 px-3 py-1 text-sm font-medium text-brand-700"
+              className="rounded-full bg-brand-50 dark:bg-brand-500/15 px-3 py-1 text-sm font-medium text-brand-700 dark:text-brand-300"
             >
               {role}
             </li>
@@ -58,17 +58,17 @@ export function SpecificationSections({ specification: spec }: { specification: 
         <ul className="space-y-4">
           {spec.functionalRequirements.map((requirement, index) => (
             <li key={index} className="flex gap-3">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-700">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-50 dark:bg-brand-500/15 text-xs font-semibold text-brand-700 dark:text-brand-300">
                 F{index + 1}
               </span>
-              <p className="text-slate-600">{requirement}</p>
+              <p className="text-slate-600 dark:text-slate-300">{requirement}</p>
             </li>
           ))}
         </ul>
       </SpecificationSection>
 
       <SpecificationSection icon={<Gauge className={ICON} />} title="Non-functional Requirements">
-        <ul className="list-disc space-y-2 pl-5 text-slate-600">
+        <ul className="list-disc space-y-2 pl-5 text-slate-600 dark:text-slate-300">
           {spec.nonFunctionalRequirements.map((requirement, index) => (
             <li key={index}>{requirement}</li>
           ))}
@@ -78,14 +78,14 @@ export function SpecificationSections({ specification: spec }: { specification: 
       <SpecificationSection icon={<BookOpen className={ICON} />} title="User Stories">
         <ul className="space-y-4">
           {spec.userStories.map((story, index) => (
-            <li key={index} className="rounded-xl border border-slate-100 p-4">
+            <li key={index} className="rounded-xl border border-slate-100 dark:border-slate-800 p-4">
               <div className="flex items-center justify-between gap-2">
-                <p className="font-semibold text-slate-900">{story.title}</p>
-                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                <p className="font-semibold text-slate-900 dark:text-slate-100">{story.title}</p>
+                <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-xs font-medium text-slate-600 dark:text-slate-300">
                   {story.role}
                 </span>
               </div>
-              <p className="mt-1 text-slate-600">{story.narrative}</p>
+              <p className="mt-1 text-slate-600 dark:text-slate-300">{story.narrative}</p>
             </li>
           ))}
         </ul>
@@ -95,12 +95,12 @@ export function SpecificationSections({ specification: spec }: { specification: 
         <ol className="space-y-4">
           {spec.milestones.map((milestone) => (
             <li key={milestone.order} className="flex gap-3">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-700">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-50 dark:bg-brand-500/15 text-xs font-semibold text-brand-700 dark:text-brand-300">
                 {milestone.order}
               </span>
               <div>
-                <p className="font-semibold text-slate-900">{milestone.name}</p>
-                <p className="mt-1 text-slate-600">{milestone.description}</p>
+                <p className="font-semibold text-slate-900 dark:text-slate-100">{milestone.name}</p>
+                <p className="mt-1 text-slate-600 dark:text-slate-300">{milestone.description}</p>
               </div>
             </li>
           ))}
@@ -108,7 +108,7 @@ export function SpecificationSections({ specification: spec }: { specification: 
       </SpecificationSection>
 
       <SpecificationSection icon={<Cpu className={ICON} />} title="Technical Considerations">
-        <ul className="list-disc space-y-2 pl-5 text-slate-600">
+        <ul className="list-disc space-y-2 pl-5 text-slate-600 dark:text-slate-300">
           {spec.technicalConsiderations.map((consideration, index) => (
             <li key={index}>{consideration}</li>
           ))}

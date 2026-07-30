@@ -9,6 +9,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
+import { useTheme } from '@mui/material/styles';
 import { useUserMenu } from './userMenu.shared';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { ColorModeToggle } from './ColorModeToggle';
@@ -21,6 +22,7 @@ export function MaterialUserMenu() {
   const { user, label, initial, onLibrary, signOutAndGoHome } = useUserMenu();
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = Boolean(anchorEl);
+  const isDark = useTheme().palette.mode === 'dark';
 
   if (!user) {
     return null;
@@ -46,19 +48,20 @@ export function MaterialUserMenu() {
           textTransform: 'none',
           borderRadius: 999,
           border: 1,
-          // Trigger sits on the coloured (indigo) AppBar, so use light-on-primary colours.
-          borderColor: 'rgba(255, 255, 255, 0.5)',
+          // The trigger sits on the AppBar: light-on-primary on the indigo (light) bar, and
+          // standard divider/text tokens on the dark bar.
+          borderColor: isDark ? 'divider' : 'rgba(255, 255, 255, 0.5)',
           pl: 0.5,
           pr: 1.5,
-          color: 'primary.contrastText',
+          color: isDark ? 'text.primary' : 'primary.contrastText',
         }}
         startIcon={
           <Avatar
             sx={{
               width: 28,
               height: 28,
-              bgcolor: 'common.white',
-              color: 'primary.main',
+              bgcolor: isDark ? 'primary.main' : 'common.white',
+              color: isDark ? 'primary.contrastText' : 'primary.main',
               fontSize: '0.75rem',
               fontWeight: 700,
             }}

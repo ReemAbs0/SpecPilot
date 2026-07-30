@@ -8,7 +8,10 @@ import { cn } from './cn';
 export function ClassicCard({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn('rounded-2xl border border-slate-100 bg-white p-6 shadow-card', className)}
+      className={cn(
+        'rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-card',
+        className,
+      )}
       {...props}
     />
   );

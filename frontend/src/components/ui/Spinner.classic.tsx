@@ -7,7 +7,10 @@ import type { SpinnerProps } from './Spinner';
 
 export function ClassicSpinner({ label, className }: SpinnerProps) {
   return (
-    <span className={cn('inline-flex items-center gap-2 text-slate-500', className)} role="status">
+    <span
+      className={cn('inline-flex items-center gap-2 text-slate-500 dark:text-slate-400', className)}
+      role="status"
+    >
       <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
       <span className={label ? undefined : 'sr-only'}>{label ?? 'Loading'}</span>
     </span>

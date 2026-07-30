@@ -41,9 +41,9 @@ export default function LoginPage() {
         isSubmitting={submitting}
         submitError={error}
       />
-      <p className="mt-6 text-sm text-slate-500">
+      <p className="mt-6 text-sm text-slate-500 dark:text-slate-400">
         Don’t have an account?{' '}
-        <Link to="/signup" className="font-medium text-brand-600 hover:text-brand-700">
+        <Link to="/signup" className="font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300">
           Create one
         </Link>
       </p>

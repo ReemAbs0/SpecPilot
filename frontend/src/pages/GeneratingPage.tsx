@@ -119,11 +119,11 @@ export default function GeneratingPage() {
         : 'Something went wrong while generating your specification. Please try again.';
     return (
       <div className="mx-auto flex max-w-xl flex-col items-center px-4 py-20 text-center sm:px-6">
-        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-red-50">
-          <AlertTriangle className="h-7 w-7 text-red-500" aria-hidden="true" />
+        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-red-50 dark:bg-red-500/10">
+          <AlertTriangle className="h-7 w-7 text-red-500 dark:text-red-400" aria-hidden="true" />
         </span>
-        <h1 className="mt-5 text-2xl font-bold text-slate-900">Generation failed</h1>
-        <p className="mt-2 text-slate-500" role="alert">
+        <h1 className="mt-5 text-2xl font-bold text-slate-900 dark:text-slate-100">Generation failed</h1>
+        <p className="mt-2 text-slate-500 dark:text-slate-400" role="alert">
           {message}
         </p>
         <div className="mt-6 flex items-center gap-3">
@@ -146,7 +146,7 @@ export default function GeneratingPage() {
         <button
           type="button"
           onClick={handleCancel}
-          className="rounded-md text-sm font-medium text-slate-500 hover:text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+          className="rounded-md text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
         >
           Cancel Generation
         </button>

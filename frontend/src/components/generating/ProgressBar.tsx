@@ -8,7 +8,7 @@ export function ProgressBar({ value }: ProgressBarProps) {
   const pct = Math.round(Math.min(1, Math.max(0, value)) * 100);
   return (
     <div
-      className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100"
+      className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"
       role="progressbar"
       aria-valuemin={0}
       aria-valuemax={100}

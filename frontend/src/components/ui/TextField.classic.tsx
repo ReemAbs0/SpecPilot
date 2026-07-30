@@ -7,10 +7,12 @@ import type { TextFieldAppearance, TextFieldProps } from './TextField';
 
 const control: Record<TextFieldAppearance, string> = {
   outlined:
-    'rounded-xl border border-slate-200 px-3 py-2 text-slate-700 placeholder:text-slate-400 ' +
+    'rounded-xl border border-slate-200 dark:border-slate-700 px-3 py-2 text-slate-700 dark:text-slate-200 ' +
+    'placeholder:text-slate-400 dark:placeholder:text-slate-500 ' +
     'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:opacity-60',
   plain:
-    'w-full resize-y rounded-xl border-0 bg-transparent text-slate-700 placeholder:text-slate-400 ' +
+    'w-full resize-y rounded-xl border-0 bg-transparent text-slate-700 dark:text-slate-200 ' +
+    'placeholder:text-slate-400 dark:placeholder:text-slate-500 ' +
     'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:opacity-60',
 };
 
@@ -73,7 +75,7 @@ export function ClassicTextField({
 
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-sm font-medium text-slate-700">
+      <label htmlFor={id} className="text-sm font-medium text-slate-700 dark:text-slate-200">
         {label}
       </label>
       {field}

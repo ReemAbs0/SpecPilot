@@ -15,7 +15,7 @@ export default function LandingPage() {
       <Hero />
 
       <section id="features" className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <h2 className="text-center text-2xl font-bold text-slate-900">
+        <h2 className="text-center text-2xl font-bold text-slate-900 dark:text-slate-100">
           Everything You Need to Plan Better Software
         </h2>
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -25,9 +25,9 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="how-it-works" className="bg-surface-lavender">
+      <section id="how-it-works" className="bg-surface-lavender dark:bg-slate-900">
         <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
-          <h2 className="text-center text-2xl font-bold text-slate-900">How SpecPilot Works</h2>
+          <h2 className="text-center text-2xl font-bold text-slate-900 dark:text-slate-100">How SpecPilot Works</h2>
           <div className="mt-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
             {STEPS.map((step) => (
               <HowItWorksStep key={step.label} {...step} />

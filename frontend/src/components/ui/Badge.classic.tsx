@@ -6,9 +6,9 @@ import type { BadgeVariant } from './Badge';
 // "AI Powered" and "Generated Successfully" pills in the approved designs.
 
 const variants: Record<BadgeVariant, string> = {
-  brand: 'bg-brand-50 text-brand-700',
-  success: 'bg-brand-50 text-brand-700',
-  neutral: 'bg-slate-100 text-slate-600',
+  brand: 'bg-brand-50 dark:bg-brand-500/15 text-brand-700 dark:text-brand-300',
+  success: 'bg-brand-50 dark:bg-brand-500/15 text-brand-700 dark:text-brand-300',
+  neutral: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300',
 };
 
 export interface ClassicBadgeProps extends HTMLAttributes<HTMLSpanElement> {

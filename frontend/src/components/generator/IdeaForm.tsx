@@ -51,8 +51,8 @@ export function IdeaForm({ value, onChange, onSubmit, isSubmitting, submitError 
 
   return (
     <Card className="flex flex-col p-0">
-      <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-        <h2 className="text-base font-semibold text-slate-900">Project Description</h2>
+      <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 px-6 py-4">
+        <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">Project Description</h2>
         <Badge variant="brand">AI Powered</Badge>
       </div>
 
@@ -73,7 +73,11 @@ export function IdeaForm({ value, onChange, onSubmit, isSubmitting, submitError 
         />
         <div className="flex items-center justify-end pb-1">
           <span
-            className={overLimit ? 'text-xs font-medium text-red-600' : 'text-xs text-slate-400'}
+            className={
+              overLimit
+                ? 'text-xs font-medium text-red-600 dark:text-red-400'
+                : 'text-xs text-slate-400 dark:text-slate-500'
+            }
           >
             {value.length} / {IDEA_MAX_LENGTH}
           </span>
@@ -81,18 +85,18 @@ export function IdeaForm({ value, onChange, onSubmit, isSubmitting, submitError 
       </div>
 
       {error && (
-        <p id="idea-error" role="alert" className="px-6 pb-2 text-sm text-red-600">
+        <p id="idea-error" role="alert" className="px-6 pb-2 text-sm text-red-600 dark:text-red-400">
           {error}
         </p>
       )}
 
-      <div className="flex items-center justify-between border-t border-slate-100 px-6 py-4">
+      <div className="flex items-center justify-between border-t border-slate-100 dark:border-slate-800 px-6 py-4">
         <button
           type="button"
           aria-label="Voice input (coming soon)"
           title="Voice input (coming soon)"
           disabled
-          className="rounded-full p-2 text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:opacity-60"
+          className="rounded-full p-2 text-slate-400 dark:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:opacity-60"
         >
           <Mic className="h-5 w-5" aria-hidden="true" />
         </button>
