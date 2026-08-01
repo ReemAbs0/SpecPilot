@@ -138,6 +138,12 @@ The project is pinned in [`.firebaserc`](.firebaserc); update it to your own pro
   account automatically (best-effort — a save failure never interrupts the result view).
 - **Browse / reopen**: **My Specifications** (`/library`) lists a user's saved specifications
   newest-first; opening one (`/library/:id`) renders it with the same view as a fresh result.
+- **Rename**: the pencil beside the title (on a fresh result or a saved one) edits it in place —
+  Enter or clicking away saves. When the specification exists in the account, the new title is
+  written to Firestore before the screen updates; for a guest it simply renames the result on
+  screen.
+- **Delete**: each library entry (and the open specification itself) can be deleted after a
+  confirmation prompt; deleting the specification currently open returns to the library.
 - Auth-only routes (`/library`, `/library/:id`) are guarded and redirect to `/login` when signed
   out.
 

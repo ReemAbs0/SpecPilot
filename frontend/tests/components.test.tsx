@@ -10,6 +10,12 @@ import type { Specification } from '../src/types/specification.types';
 
 // T040: component tests for IdeaForm validation and ResultPage section rendering.
 
+// ResultPage reads auth to persist a renamed title; a guest (user: null) keeps the rename local.
+vi.mock('../src/state/AuthContext', () => ({
+  AuthProvider: ({ children }: { children: ReactNode }) => children,
+  useAuth: () => ({ user: null, loading: false }),
+}));
+
 describe('IdeaForm validation', () => {
   it('blocks submission below the minimum length and shows a message', async () => {
     const user = userEvent.setup();

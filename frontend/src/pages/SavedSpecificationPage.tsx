@@ -1,19 +1,27 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { AlertTriangle, ArrowLeft, FileQuestion } from 'lucide-react';
 import { useAuth } from '../state/AuthContext';
 import { useSpecification } from '../state/SpecificationContext';
-import { getSpecification } from '../services/specificationStore';
+import {
+  deleteSpecification,
+  getSpecification,
+  updateSpecificationTitle,
+} from '../services/specificationStore';
 import { ResultHeader } from '../components/result/ResultHeader';
 import { SpecificationSections } from '../components/result/SpecificationSections';
 import { ActionsPanel } from '../components/result/ActionsPanel';
-import { Button, Spinner } from '../components/ui';
+import { Button, ConfirmDialog, Spinner } from '../components/ui';
 import type { SavedSpecification } from '../types/savedSpecification.types';
 
 // Saved-specification detail page (feature/firebase-auth, Phase 6). Fetches one saved record via
 // GET /api/me/specifications/:id and renders it with the SAME layout and components as the live
 // result page (ResultHeader + SpecificationSections + ActionsPanel) — no duplicated UI. This
 // route is wrapped by RequireAuth, so a user is always present.
+//
+// The record can also be renamed in place (PATCH, via the shared ResultHeader) and deleted
+// (DELETE, after confirmation) — deleting the specification that is open navigates back to the
+// library, since this page no longer has anything to show.
 
 type LoadState =
   | { status: 'loading' }
@@ -49,7 +57,11 @@ export default function SavedSpecificationPage() {
   const { id } = useParams();
   const { user } = useAuth();
   const { dispatch } = useSpecification();
+  const navigate = useNavigate();
   const [state, setState] = useState<LoadState>({ status: 'loading' });
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user || !id) {
@@ -83,6 +95,55 @@ export default function SavedSpecificationPage() {
       cancelled = true;
     };
   }, [user, id, dispatch]);
+
+  /**
+   * Renames this saved specification. Persists first and only mirrors the new title into local
+   * state once Firestore accepted it; throwing lets the header show its inline error.
+   */
+  async function handleSaveTitle(nextTitle: string) {
+    if (!user || !id) {
+      throw new Error('not_ready');
+    }
+    const token = await user.getIdToken();
+    const result = await updateSpecificationTitle(token, id, nextTitle);
+    if (!result.ok) {
+      throw new Error(result.error ?? 'rename_failed');
+    }
+    setState((current) =>
+      current.status === 'ready'
+        ? {
+            status: 'ready',
+            saved: {
+              ...current.saved,
+              title: nextTitle,
+              specification: { ...current.saved.specification, title: nextTitle },
+            },
+          }
+        : current,
+    );
+  }
+
+  async function handleConfirmDelete() {
+    if (!user || !id || deleting) {
+      return;
+    }
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      const result = await deleteSpecification(await user.getIdToken(), id);
+      // Already gone (404) counts as deleted — either way this page has nothing left to show.
+      if (result.ok || result.notFound) {
+        setConfirmingDelete(false);
+        navigate('/library', { replace: true });
+        return;
+      }
+      setDeleteError('We couldn’t delete this specification. Please try again.');
+    } catch {
+      setDeleteError('We couldn’t delete this specification. Please try again.');
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   if (state.status === 'loading') {
     return (
@@ -140,7 +201,15 @@ export default function SavedSpecificationPage() {
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
       <BackLink />
       <div className="mt-4">
-        <ResultHeader title={spec.title} timestamp={formatSavedAt(state.saved.createdAt)} />
+        <ResultHeader
+          title={spec.title}
+          timestamp={formatSavedAt(state.saved.createdAt)}
+          onSaveTitle={handleSaveTitle}
+          onDelete={() => {
+            setDeleteError(null);
+            setConfirmingDelete(true);
+          }}
+        />
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-3">
@@ -152,6 +221,25 @@ export default function SavedSpecificationPage() {
           </div>
         </aside>
       </div>
+
+      <ConfirmDialog
+        open={confirmingDelete}
+        title="Delete specification?"
+        message={
+          <>“{state.saved.title}” will be permanently removed from your account. This can’t be undone.</>
+        }
+        confirmLabel="Delete"
+        busyLabel="Deleting…"
+        busy={deleting}
+        error={deleteError}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => {
+          if (!deleting) {
+            setConfirmingDelete(false);
+            setDeleteError(null);
+          }
+        }}
+      />
     </div>
   );
 }

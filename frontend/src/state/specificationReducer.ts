@@ -23,6 +23,12 @@ export interface SpecState {
   completedStages: GenerationStage[];
   /** The generated specification; set on success. */
   specification: Specification | null;
+  /**
+   * Firestore id of the current specification once it has been persisted to a signed-in user's
+   * account. null for guests, and until the best-effort save resolves — a title edit then only
+   * updates local state (there is nothing to persist to).
+   */
+  savedId: string | null;
   /** Why generation failed; set on error (FR-011/FR-011a). */
   error: GenerationFailureReason | null;
 }
@@ -34,6 +40,7 @@ export const initialSpecState: SpecState = {
   activeStage: null,
   completedStages: [],
   specification: null,
+  savedId: null,
   error: null,
 };
 
@@ -45,6 +52,10 @@ export type SpecAction =
   | { type: 'STAGE_STARTED'; stage: GenerationStage }
   | { type: 'STAGE_COMPLETED'; stage: GenerationStage }
   | { type: 'SUCCEEDED'; specification: Specification }
+  // The specification was persisted to the signed-in user's account (best-effort, after success).
+  | { type: 'SAVED'; id: string }
+  // The user renamed the specification from the result page.
+  | { type: 'TITLE_UPDATED'; title: string }
   | { type: 'FAILED'; reason: GenerationFailureReason }
   // Cancel an in-progress generation (FR-011b): return to idle but keep the idea text.
   | { type: 'CANCEL' };
@@ -54,7 +65,9 @@ export function specReducer(state: SpecState, action: SpecAction): SpecState {
     case 'SET_IDEA':
       return { ...state, ideaText: action.text };
     case 'SUBMIT':
-      return { ...state, status: 'submitting', error: null, specification: null };
+      // A new run replaces the previous result, so the previous saved record is no longer the
+      // one on screen — drop its id (the new run gets its own on save).
+      return { ...state, status: 'submitting', error: null, specification: null, savedId: null };
     case 'GENERATION_STARTED':
       return {
         ...state,
@@ -62,6 +75,7 @@ export function specReducer(state: SpecState, action: SpecAction): SpecState {
         sessionId: action.sessionId,
         activeStage: null,
         completedStages: [],
+        savedId: null,
         error: null,
       };
     case 'STAGE_STARTED':
@@ -80,6 +94,13 @@ export function specReducer(state: SpecState, action: SpecAction): SpecState {
         specification: action.specification,
         activeStage: null,
       };
+    case 'SAVED':
+      return { ...state, savedId: action.id };
+    case 'TITLE_UPDATED':
+      // Nothing to rename before a specification exists; ignore rather than fabricate one.
+      return state.specification
+        ? { ...state, specification: { ...state.specification, title: action.title } }
+        : state;
     case 'FAILED':
       return { ...state, status: 'error', error: action.reason, activeStage: null };
     case 'CANCEL':

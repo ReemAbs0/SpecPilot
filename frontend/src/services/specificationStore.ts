@@ -121,3 +121,73 @@ export async function getSpecification(idToken: string, id: string): Promise<Get
   }
   return { ok: false, error: `status_${response.status}` };
 }
+
+export interface MutationResult {
+  ok: boolean;
+  /** True on a 404 — the record is not (or no longer) in this user's account. */
+  notFound?: boolean;
+  /** Machine-readable failure hint for logging; never shown to the user. */
+  error?: string;
+}
+
+/**
+ * Renames one saved specification. The caller has already validated the title; a blank one is
+ * rejected here too so a bug can never wipe a stored title. Returns a result object, never throws.
+ */
+export async function updateSpecificationTitle(
+  idToken: string,
+  id: string,
+  title: string,
+): Promise<MutationResult> {
+  const trimmed = title.trim();
+  if (trimmed === '') {
+    return { ok: false, error: 'empty_title' };
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(apiUrl(`/api/me/specifications/${encodeURIComponent(id)}`), {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${idToken}`,
+      },
+      body: JSON.stringify({ title: trimmed }),
+    });
+  } catch {
+    return { ok: false, error: 'network_error' };
+  }
+
+  if (response.status === 200) {
+    return { ok: true };
+  }
+  if (response.status === 404) {
+    return { ok: false, notFound: true, error: 'not_found' };
+  }
+  return { ok: false, error: `status_${response.status}` };
+}
+
+/**
+ * Deletes one saved specification. A 404 is reported via `notFound` rather than as a hard
+ * failure: the record is gone either way, so callers can safely drop it from the list.
+ * Returns a result object, never throws.
+ */
+export async function deleteSpecification(idToken: string, id: string): Promise<MutationResult> {
+  let response: Response;
+  try {
+    response = await fetch(apiUrl(`/api/me/specifications/${encodeURIComponent(id)}`), {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${idToken}` },
+    });
+  } catch {
+    return { ok: false, error: 'network_error' };
+  }
+
+  if (response.status === 204 || response.status === 200) {
+    return { ok: true };
+  }
+  if (response.status === 404) {
+    return { ok: false, notFound: true, error: 'not_found' };
+  }
+  return { ok: false, error: `status_${response.status}` };
+}

@@ -25,7 +25,8 @@ export function cors(req: Request, res: Response, next: NextFunction): void {
   }
   // Responses vary by request origin, so caches must key on it.
   res.setHeader('Vary', 'Origin');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  // PATCH/DELETE are used by the rename and delete endpoints under /api/me/specifications/:id.
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Max-Age', '86400');
 

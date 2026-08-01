@@ -12,6 +12,8 @@ const ctrl = vi.hoisted(() => ({
   save: vi.fn(async (_uid: string, _input: unknown) => ({ id: 'spec-abc' })),
   list: vi.fn(async (_uid: string) => [] as unknown[]),
   get: vi.fn(async (_uid: string, _id: string) => null as unknown),
+  updateTitle: vi.fn(async (_uid: string, _id: string, _title: string) => true),
+  remove: vi.fn(async (_uid: string, _id: string) => true),
 }));
 
 vi.mock('../../src/lib/firebaseAdmin', () => ({
@@ -24,6 +26,9 @@ vi.mock('../../src/services/specificationStore', () => ({
   saveSpecification: (uid: string, input: unknown) => ctrl.save(uid, input),
   listSpecifications: (uid: string) => ctrl.list(uid),
   getSpecification: (uid: string, id: string) => ctrl.get(uid, id),
+  updateSpecificationTitle: (uid: string, id: string, title: string) =>
+    ctrl.updateTitle(uid, id, title),
+  deleteSpecification: (uid: string, id: string) => ctrl.remove(uid, id),
 }));
 
 import { app } from '../../src/server';
@@ -47,6 +52,8 @@ beforeEach(() => {
   ctrl.save.mockReset().mockResolvedValue({ id: 'spec-abc' });
   ctrl.list.mockReset().mockResolvedValue([]);
   ctrl.get.mockReset().mockResolvedValue(null);
+  ctrl.updateTitle.mockReset().mockResolvedValue(true);
+  ctrl.remove.mockReset().mockResolvedValue(true);
 });
 
 describe('authentication (contract)', () => {
@@ -154,5 +161,88 @@ describe('GET /api/me/specifications/:id (contract)', () => {
 
     expect(res.status).toBe(404);
     expect(res.body.error).toBe('not_found');
+  });
+});
+
+describe('PATCH /api/me/specifications/:id (contract)', () => {
+  it('200 renames the specification under the token uid, trimming the title', async () => {
+    const res = await request(app)
+      .patch('/api/me/specifications/spec-abc')
+      .set('Authorization', 'Bearer good-token')
+      .send({ title: '  Renamed Specification  ' });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ id: 'spec-abc', title: 'Renamed Specification' });
+    expect(ctrl.updateTitle).toHaveBeenCalledWith('user-123', 'spec-abc', 'Renamed Specification');
+  });
+
+  it('422 when the title is blank, and does not write', async () => {
+    const res = await request(app)
+      .patch('/api/me/specifications/spec-abc')
+      .set('Authorization', 'Bearer good-token')
+      .send({ title: '   ' });
+
+    expect(res.status).toBe(422);
+    expect(res.body.error).toBe('invalid_request');
+    expect(ctrl.updateTitle).not.toHaveBeenCalled();
+  });
+
+  it('422 when the title is too long, and does not write', async () => {
+    const res = await request(app)
+      .patch('/api/me/specifications/spec-abc')
+      .set('Authorization', 'Bearer good-token')
+      .send({ title: 'x'.repeat(201) });
+
+    expect(res.status).toBe(422);
+    expect(res.body.error).toBe('title_too_long');
+    expect(ctrl.updateTitle).not.toHaveBeenCalled();
+  });
+
+  it('404 when the record does not exist for this user', async () => {
+    ctrl.updateTitle.mockResolvedValue(false);
+    const res = await request(app)
+      .patch('/api/me/specifications/missing')
+      .set('Authorization', 'Bearer good-token')
+      .send({ title: 'Renamed' });
+
+    expect(res.status).toBe(404);
+    expect(res.body.error).toBe('not_found');
+  });
+
+  it('401 without a token, and does not write', async () => {
+    const res = await request(app)
+      .patch('/api/me/specifications/spec-abc')
+      .send({ title: 'Renamed' });
+
+    expect(res.status).toBe(401);
+    expect(ctrl.updateTitle).not.toHaveBeenCalled();
+  });
+});
+
+describe('DELETE /api/me/specifications/:id (contract)', () => {
+  it('204 deletes the specification under the token uid', async () => {
+    const res = await request(app)
+      .delete('/api/me/specifications/spec-abc')
+      .set('Authorization', 'Bearer good-token');
+
+    expect(res.status).toBe(204);
+    expect(ctrl.remove).toHaveBeenCalledWith('user-123', 'spec-abc');
+  });
+
+  it('404 when the record does not exist for this user', async () => {
+    ctrl.remove.mockResolvedValue(false);
+    const res = await request(app)
+      .delete('/api/me/specifications/missing')
+      .set('Authorization', 'Bearer good-token');
+
+    expect(res.status).toBe(404);
+    expect(res.body.error).toBe('not_found');
+  });
+
+  it('401 without a token, and does not delete', async () => {
+    const res = await request(app).delete('/api/me/specifications/spec-abc');
+
+    expect(res.status).toBe(401);
+    expect(ctrl.remove).not.toHaveBeenCalled();
   });
 });

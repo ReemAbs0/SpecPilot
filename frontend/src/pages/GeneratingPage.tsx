@@ -19,21 +19,28 @@ import type { Specification } from '../types/specification.types';
 // it never blocks navigation to the result and never alters the generation flow, so guests are
 // completely unaffected.
 
-/** Best-effort persistence of a just-generated specification. Swallows all errors. */
+/**
+ * Best-effort persistence of a just-generated specification. Swallows all errors. Returns the new
+ * record's id when the save succeeded, so the result page knows the specification exists in
+ * Firestore and can persist a title edit to it; null means "local only".
+ */
 async function persistToAccount(
   user: User,
   idea: string,
   specification: Specification,
-): Promise<void> {
+): Promise<string | null> {
   try {
     const token = await user.getIdToken();
     const result = await saveSpecification(token, { idea, specification });
     if (!result.ok) {
       console.warn(`[specpilot] could not save specification: ${result.error ?? 'unknown'}`);
+      return null;
     }
+    return result.id ?? null;
   } catch {
     // Persistence must never surface as a generation error.
     console.warn('[specpilot] could not save specification.');
+    return null;
   }
 }
 
@@ -70,7 +77,11 @@ export default function GeneratingPage() {
         // Save to the account only when signed in; guests just see the result.
         const currentUser = userRef.current;
         if (currentUser) {
-          void persistToAccount(currentUser, ideaRef.current, specification);
+          void persistToAccount(currentUser, ideaRef.current, specification).then((savedId) => {
+            if (savedId) {
+              dispatch({ type: 'SAVED', id: savedId });
+            }
+          });
         }
       },
       onFailed: (reason) => dispatch({ type: 'FAILED', reason }),

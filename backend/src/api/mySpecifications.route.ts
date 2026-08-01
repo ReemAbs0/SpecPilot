@@ -1,9 +1,11 @@
 import { Router, type Request, type Response } from 'express';
 import { authenticate } from '../middleware/authenticate';
 import {
+  deleteSpecification,
   getSpecification,
   listSpecifications,
   saveSpecification,
+  updateSpecificationTitle,
 } from '../services/specificationStore';
 import type { Specification } from '../models/specification.types';
 
@@ -12,11 +14,16 @@ import type { Specification } from '../models/specification.types';
 // records. These are additive — the generation endpoints in specifications.route.ts are
 // untouched and remain anonymous.
 //
-//   POST /api/me/specifications      — save a generated specification (201 { id })
-//   GET  /api/me/specifications      — list the user's saved specifications (summaries)
-//   GET  /api/me/specifications/:id  — fetch one saved specification in full
+//   POST   /api/me/specifications      — save a generated specification (201 { id })
+//   GET    /api/me/specifications      — list the user's saved specifications (summaries)
+//   GET    /api/me/specifications/:id  — fetch one saved specification in full
+//   PATCH  /api/me/specifications/:id  — rename one saved specification (200 { id, title })
+//   DELETE /api/me/specifications/:id  — delete one saved specification (204)
 
 export const mySpecificationsRouter = Router();
+
+/** Upper bound on a renamed title — generous for a headline, but not unbounded input. */
+const MAX_TITLE_LENGTH = 200;
 
 // All /api/me routes are authenticated.
 mySpecificationsRouter.use(authenticate);
@@ -124,5 +131,60 @@ mySpecificationsRouter.get('/specifications/:id', async (req: Request, res: Resp
     const name = error instanceof Error ? error.name : 'UnknownError';
     console.error(`[error] ${req.method} ${req.path}: ${name}`);
     res.status(500).json({ error: 'internal_error', message: 'Could not load the specification.' });
+  }
+});
+
+/** PATCH /api/me/specifications/:id — rename one saved specification. */
+mySpecificationsRouter.patch('/specifications/:id', async (req: Request, res: Response) => {
+  const uid = req.uid as string;
+  const id = String(req.params.id);
+  const body = req.body as { title?: unknown } | undefined;
+  const title = typeof body?.title === 'string' ? body.title.trim() : '';
+
+  if (title === '') {
+    res.status(422).json({ error: 'invalid_request', message: 'A title is required.' });
+    return;
+  }
+  if (title.length > MAX_TITLE_LENGTH) {
+    res.status(422).json({
+      error: 'title_too_long',
+      message: `Please keep the title to ${MAX_TITLE_LENGTH} characters or fewer.`,
+    });
+    return;
+  }
+
+  try {
+    const updated = await updateSpecificationTitle(uid, id, title);
+    if (!updated) {
+      res.status(404).json({ error: 'not_found', message: 'Specification not found.' });
+      return;
+    }
+    res.status(200).json({ id, title });
+  } catch (error) {
+    const name = error instanceof Error ? error.name : 'UnknownError';
+    console.error(`[error] ${req.method} ${req.path}: ${name}`);
+    res
+      .status(500)
+      .json({ error: 'internal_error', message: 'Could not rename the specification.' });
+  }
+});
+
+/** DELETE /api/me/specifications/:id — permanently delete one saved specification. */
+mySpecificationsRouter.delete('/specifications/:id', async (req: Request, res: Response) => {
+  const uid = req.uid as string;
+  const id = String(req.params.id);
+  try {
+    const deleted = await deleteSpecification(uid, id);
+    if (!deleted) {
+      res.status(404).json({ error: 'not_found', message: 'Specification not found.' });
+      return;
+    }
+    res.status(204).end();
+  } catch (error) {
+    const name = error instanceof Error ? error.name : 'UnknownError';
+    console.error(`[error] ${req.method} ${req.path}: ${name}`);
+    res
+      .status(500)
+      .json({ error: 'internal_error', message: 'Could not delete the specification.' });
   }
 });

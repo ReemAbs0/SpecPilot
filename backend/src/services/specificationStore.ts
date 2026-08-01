@@ -56,6 +56,40 @@ export async function listSpecifications(uid: string): Promise<SavedSpecificatio
   });
 }
 
+/**
+ * Renames one saved specification. Writes both the denormalised `title` (used by the list view)
+ * and the nested `specification.title` so every read path shows the new name. Returns false when
+ * the record does not exist for this user — the caller turns that into a 404.
+ */
+export async function updateSpecificationTitle(
+  uid: string,
+  id: string,
+  title: string,
+): Promise<boolean> {
+  const ref = userSpecifications(uid).doc(id);
+  const doc = await ref.get();
+  if (!doc.exists) {
+    return false;
+  }
+  // Dotted paths update the single nested field, leaving the rest of the specification intact.
+  await ref.update({ title, 'specification.title': title });
+  return true;
+}
+
+/**
+ * Deletes one saved specification. Returns false when the record does not exist for this user,
+ * so the caller can answer 404 instead of silently reporting success for someone else's id.
+ */
+export async function deleteSpecification(uid: string, id: string): Promise<boolean> {
+  const ref = userSpecifications(uid).doc(id);
+  const doc = await ref.get();
+  if (!doc.exists) {
+    return false;
+  }
+  await ref.delete();
+  return true;
+}
+
 /** Fetches one saved specification by id, or null if it does not exist for this user. */
 export async function getSpecification(
   uid: string,
