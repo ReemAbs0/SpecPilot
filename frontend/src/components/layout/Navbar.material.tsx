@@ -9,12 +9,13 @@ import { useTheme } from '@mui/material/styles';
 import { useAuth } from '../../state/AuthContext';
 import { useSpecification } from '../../state/SpecificationContext';
 import { UserMenu } from './UserMenu';
+import { ColorModeToggle } from './ColorModeToggle';
 import { NAV_LINKS } from './navLinks';
 
 // Material (MUI) top navigation. A coloured, elevated MUI AppBar — the clearest signal that the
 // Material theme is active (vs the Classic flat, bordered, near-white header). Same content and
-// routing as the Classic navbar; the profile menu (with the theme switcher) reuses the shared
-// theme-aware UserMenu. In light mode the bar is indigo and controls use light-on-primary
+// routing as the Classic navbar, including the light/dark toggle at the far right; the profile
+// menu reuses the shared theme-aware UserMenu. In light mode the bar is indigo and controls use light-on-primary
 // colours; in dark mode the bar becomes a dark surface (background.paper) and controls switch to
 // standard readable text tokens, so nothing relies on hardcoded light colours.
 
@@ -107,6 +108,9 @@ export function MaterialNavbar() {
           >
             Get Started
           </MuiButton>
+
+          {/* Far right, and outside the auth-gated block: available signed in or out. */}
+          <ColorModeToggle />
         </Toolbar>
       </Container>
     </AppBar>

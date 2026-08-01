@@ -1,57 +1,34 @@
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { useThemeMode, type ThemeMode } from '../../state/ThemeContext';
 import { cn } from '../ui';
 
-// Visible runtime theme switcher (feature/material-theme). A two-option segmented control shown
-// in the navbar that flips between the Classic (Tailwind) and Material (MUI) design systems. The
-// selection is persisted to localStorage by ThemeModeProvider, so it survives refreshes. The
-// control is itself theme-aware so it looks native in whichever theme is active.
+// The Classic/Material design-system switch, rendered by DesignSystemDock in the bottom-left
+// corner of the viewport.
+//
+// Deliberately NOT theme-aware. Every other piece of chrome re-renders itself in the active
+// design system, but this control is the thing that *chooses* the design system: if it restyled
+// itself on each switch, the one fixed reference point on screen would move underneath the user
+// mid-decision. It therefore has a single neutral appearance — a plain segmented control in
+// neither the Classic nor the Material idiom — and the only thing that changes on switching is
+// which segment reads as selected.
+//
+// Neutral also means no brand accent on the active segment (that indigo is the app's own
+// styling, not a neutral one) and an explicit `font-sans`, so the control cannot inherit
+// typography from whichever theme surrounds it. It still tracks light/dark, which is a separate
+// axis from the design system and only affects legibility against the page behind it.
 
 const OPTIONS: Array<{ value: ThemeMode; label: string }> = [
   { value: 'classic', label: 'Classic' },
   { value: 'material', label: 'Material' },
 ];
 
-export interface ThemeSwitcherProps {
-  // Tab order for the controls. Pass -1 to take them out of the tab order while a containing
-  // dropdown is closed (the Classic profile menu stays mounted for its open/close animation).
-  tabIndex?: number;
-}
-
-export function ThemeSwitcher({ tabIndex = 0 }: ThemeSwitcherProps = {}) {
+export function ThemeSwitcher() {
   const { mode, setMode } = useThemeMode();
-
-  if (mode === 'material') {
-    return (
-      <ToggleButtonGroup
-        size="small"
-        exclusive
-        value={mode}
-        onChange={(_event, next: ThemeMode | null) => {
-          // MUI passes null when the active button is re-clicked — ignore it so a theme is always
-          // selected.
-          if (next) {
-            setMode(next);
-          }
-        }}
-        aria-label="Theme"
-        sx={{ '& .MuiToggleButton-root': { textTransform: 'none', px: 1.5, py: 0.25 } }}
-      >
-        {OPTIONS.map((option) => (
-          <ToggleButton key={option.value} value={option.value}>
-            {option.label}
-          </ToggleButton>
-        ))}
-      </ToggleButtonGroup>
-    );
-  }
 
   return (
     <div
       role="group"
-      aria-label="Theme"
-      className="inline-flex items-center rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-0.5 text-xs font-medium"
+      aria-label="Design system"
+      className="inline-flex items-center rounded-full border border-slate-300 bg-slate-100 p-0.5 font-sans text-xs font-medium dark:border-slate-700 dark:bg-slate-800"
     >
       {OPTIONS.map((option) => {
         const active = mode === option.value;
@@ -59,12 +36,13 @@ export function ThemeSwitcher({ tabIndex = 0 }: ThemeSwitcherProps = {}) {
           <button
             key={option.value}
             type="button"
-            tabIndex={tabIndex}
             onClick={() => setMode(option.value)}
             aria-pressed={active}
             className={cn(
-              'rounded-full px-2.5 py-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500',
-              active ? 'bg-brand-600 text-white' : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white',
+              'rounded-full px-2.5 py-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-500',
+              active
+                ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-950 dark:text-white'
+                : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white',
             )}
           >
             {option.label}

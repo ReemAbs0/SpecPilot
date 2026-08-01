@@ -11,12 +11,12 @@ import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/material/styles';
 import { useUserMenu } from './userMenu.shared';
-import { ThemeSwitcher } from './ThemeSwitcher';
-import { ColorModeToggle } from './ColorModeToggle';
 
 // Material (MUI) profile menu. Same account actions and behaviour as the Classic dropdown, built
 // from MUI's Avatar / Menu / MenuItem. Auth wiring is shared via useUserMenu, so only the
 // presentation differs.
+//
+// Account actions only — the theme controls moved out to DesignSystemDock and the navbar.
 
 export function MaterialUserMenu() {
   const { user, label, initial, onLibrary, signOutAndGoHome } = useUserMenu();
@@ -112,30 +112,6 @@ export function MaterialUserMenu() {
           </ListItemIcon>
           My Specifications
         </MenuItem>
-
-        <Divider />
-
-        <Box sx={{ px: 2, py: 1 }}>
-          <Typography
-            variant="caption"
-            sx={{ display: 'block', color: 'text.secondary', pb: 0.75 }}
-          >
-            Theme
-          </Typography>
-          <ThemeSwitcher />
-        </Box>
-
-        <Divider />
-
-        <Box sx={{ px: 2, py: 1 }}>
-          <Typography
-            variant="caption"
-            sx={{ display: 'block', color: 'text.secondary', pb: 0.75 }}
-          >
-            Appearance
-          </Typography>
-          <ColorModeToggle />
-        </Box>
 
         <Divider />
 

@@ -7,6 +7,7 @@ import { SpecificationProvider } from './state/SpecificationContext';
 import { ThemeModeProvider, useThemeMode } from './state/ThemeContext';
 import { muiTheme, muiThemeDark } from './lib/muiTheme';
 import { Navbar } from './components/layout/Navbar';
+import { DesignSystemDock } from './components/layout/DesignSystemDock';
 import LandingPage from './pages/LandingPage';
 import GeneratorPage from './pages/GeneratorPage';
 import GeneratingPage from './pages/GeneratingPage';
@@ -28,6 +29,10 @@ function AppLayout() {
       <main id="main">
         <Outlet />
       </main>
+      {/* Fixed to the viewport, so it stays put while the page scrolls and is present on every
+          route — including the public ones. Rendered last so it is not read before the page
+          content in DOM order. */}
+      <DesignSystemDock />
     </>
   );
 }
@@ -36,7 +41,10 @@ function NotFound() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
       <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Page not found</h1>
-      <Link to="/" className="mt-2 inline-block text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300">
+      <Link
+        to="/"
+        className="mt-2 inline-block text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300"
+      >
         Go back home
       </Link>
     </section>
@@ -69,21 +77,21 @@ export default function App() {
         <AuthProvider>
           <SpecificationProvider>
             <BrowserRouter>
-          <Routes>
-            <Route element={<AppLayout />}>
-              <Route index element={<LandingPage />} />
-              <Route path="generate" element={<GeneratorPage />} />
-              <Route path="generate/progress" element={<GeneratingPage />} />
-              <Route path="result" element={<ResultPage />} />
-              <Route path="login" element={<LoginPage />} />
-              <Route path="signup" element={<SignupPage />} />
-              <Route element={<RequireAuth />}>
-                <Route path="library" element={<LibraryPage />} />
-                <Route path="library/:id" element={<SavedSpecificationPage />} />
-              </Route>
-              <Route path="*" element={<NotFound />} />
-            </Route>
-          </Routes>
+              <Routes>
+                <Route element={<AppLayout />}>
+                  <Route index element={<LandingPage />} />
+                  <Route path="generate" element={<GeneratorPage />} />
+                  <Route path="generate/progress" element={<GeneratingPage />} />
+                  <Route path="result" element={<ResultPage />} />
+                  <Route path="login" element={<LoginPage />} />
+                  <Route path="signup" element={<SignupPage />} />
+                  <Route element={<RequireAuth />}>
+                    <Route path="library" element={<LibraryPage />} />
+                    <Route path="library/:id" element={<SavedSpecificationPage />} />
+                  </Route>
+                  <Route path="*" element={<NotFound />} />
+                </Route>
+              </Routes>
             </BrowserRouter>
           </SpecificationProvider>
         </AuthProvider>

@@ -1,82 +1,42 @@
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import IconButton from '@mui/material/IconButton';
 import { Moon, Sun } from 'lucide-react';
-import { useThemeMode, type ColorMode } from '../../state/ThemeContext';
-import { cn } from '../ui';
+import { useThemeMode } from '../../state/ThemeContext';
 
-// Colour-mode switcher (feature/dark-mode). A two-option Light/Dark segmented control that sits
-// alongside the Classic/Material theme switcher in the profile dropdown. Colour mode is an axis
-// independent of the design system, and the selection is persisted to localStorage by
-// ThemeModeProvider. Like ThemeSwitcher, the control is itself theme-aware so it looks native in
-// whichever design system is active.
+// Light/Dark switch for the far right of the navbar. Previously a two-option segmented control
+// buried in the profile dropdown; it is now a single icon button on the bar itself, available
+// signed in or out.
+//
+// The icon shows the mode you would switch TO, which is the convention users expect from a
+// one-click toggle: a moon while Light is active, a sun while Dark is active. The accessible
+// name states the action rather than the state, so it never reads ambiguously in a screen
+// reader. Colour-mode state and persistence are unchanged — this calls ThemeContext's existing
+// `toggleColorMode`.
 
-const OPTIONS: Array<{ value: ColorMode; label: string; Icon: typeof Sun }> = [
-  { value: 'light', label: 'Light', Icon: Sun },
-  { value: 'dark', label: 'Dark', Icon: Moon },
-];
-
-export interface ColorModeToggleProps {
-  // Tab order for the controls. Pass -1 to take them out of the tab order while a containing
-  // dropdown is closed (the Classic profile menu stays mounted for its open/close animation).
-  tabIndex?: number;
-}
-
-export function ColorModeToggle({ tabIndex = 0 }: ColorModeToggleProps = {}) {
-  const { mode, colorMode, setColorMode } = useThemeMode();
+export function ColorModeToggle() {
+  const { mode, colorMode, toggleColorMode } = useThemeMode();
+  const isDark = colorMode === 'dark';
+  const label = isDark ? 'Switch to light mode' : 'Switch to dark mode';
+  const Icon = isDark ? Sun : Moon;
 
   if (mode === 'material') {
     return (
-      <ToggleButtonGroup
-        size="small"
-        exclusive
-        value={colorMode}
-        onChange={(_event, next: ColorMode | null) => {
-          // MUI passes null when the active button is re-clicked — ignore it so a mode is always
-          // selected.
-          if (next) {
-            setColorMode(next);
-          }
-        }}
-        aria-label="Colour mode"
-        sx={{ '& .MuiToggleButton-root': { textTransform: 'none', px: 1.5, py: 0.25, gap: 0.75 } }}
-      >
-        {OPTIONS.map(({ value, label, Icon }) => (
-          <ToggleButton key={value} value={value}>
-            <Icon size={15} aria-hidden="true" />
-            {label}
-          </ToggleButton>
-        ))}
-      </ToggleButtonGroup>
+      // `color="inherit"` keeps the button legible on both AppBar treatments: white on the
+      // indigo light bar, standard text colour on the dark bar.
+      <IconButton onClick={toggleColorMode} aria-label={label} title={label} color="inherit">
+        <Icon size={20} aria-hidden="true" />
+      </IconButton>
     );
   }
 
   return (
-    <div
-      role="group"
-      aria-label="Colour mode"
-      className="inline-flex items-center rounded-full border border-slate-200 bg-white p-0.5 text-xs font-medium dark:border-slate-700 dark:bg-slate-800"
+    <button
+      type="button"
+      onClick={toggleColorMode}
+      aria-label={label}
+      title={label}
+      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
     >
-      {OPTIONS.map(({ value, label, Icon }) => {
-        const active = colorMode === value;
-        return (
-          <button
-            key={value}
-            type="button"
-            tabIndex={tabIndex}
-            onClick={() => setColorMode(value)}
-            aria-pressed={active}
-            className={cn(
-              'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500',
-              active
-                ? 'bg-brand-600 text-white'
-                : 'text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white',
-            )}
-          >
-            <Icon size={14} aria-hidden="true" />
-            {label}
-          </button>
-        );
-      })}
-    </div>
+      <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
+    </button>
   );
 }

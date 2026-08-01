@@ -4,11 +4,12 @@ import { Button } from '../ui';
 import { useAuth } from '../../state/AuthContext';
 import { useSpecification } from '../../state/SpecificationContext';
 import { UserMenu } from './UserMenu';
+import { ColorModeToggle } from './ColorModeToggle';
 import { NAV_LINKS } from './navLinks';
 
 // Classic (Tailwind) top navigation — the original navbar. Logo left, section links, an auth
-// control, and the primary "Get Started" CTA. The theme switcher lives inside the profile menu
-// (UserMenu), not here.
+// control, the primary "Get Started" CTA, and the light/dark toggle at the far right. The
+// design-system switch is not here: it floats bottom-left (DesignSystemDock).
 
 export function ClassicNavbar() {
   const { user, loading } = useAuth();
@@ -67,6 +68,9 @@ export function ClassicNavbar() {
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Button>
           </Link>
+
+          {/* Far right, and outside the auth-gated block: available signed in or out. */}
+          <ColorModeToggle />
         </div>
       </nav>
     </header>
