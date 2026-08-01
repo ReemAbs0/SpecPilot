@@ -25,8 +25,10 @@ services:
         value: https://api.asi1.ai/v1
       - key: FETCH_AI_MODEL
         value: asi1-mini
+      - key: FETCH_AI_MAX_TOKENS
+        value: "6000"
       - key: GENERATION_TIMEOUT_MS
-        value: "90000"
+        value: "180000"
       - key: IDEA_MIN_LENGTH
         value: "20"
       - key: IDEA_MAX_LENGTH

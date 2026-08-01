@@ -4,7 +4,14 @@ import { requestCompletion, type FetchAiMessage } from '../services/fetchAiClien
 // for JSON and validates the fields it needs; malformed output throws, which the
 // orchestrator maps to an 'upstream-error' failure (FR-011).
 
-/** Sends a system+user prompt to the model and parses the reply as a JSON object. */
+/**
+ * Sends a system+user prompt to the model and parses the reply as a JSON object.
+ *
+ * One retry: the stages ask for long, densely-structured sections, and at that length an
+ * occasional malformed reply or transient upstream hiccup is expected. Retrying the single
+ * stage costs seconds; not retrying costs the whole generation. Aborts (cancellation and
+ * timeout, FR-011a/FR-011b) are never retried — they propagate immediately.
+ */
 export async function requestJson<T>(
   systemPrompt: string,
   userPrompt: string,
@@ -14,8 +21,26 @@ export async function requestJson<T>(
     { role: 'system', content: systemPrompt },
     { role: 'user', content: userPrompt },
   ];
-  const raw = await requestCompletion(messages, opts);
-  return parseJsonObject<T>(raw);
+
+  try {
+    return parseJsonObject<T>(await requestCompletion(messages, opts));
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw error;
+    }
+    opts.signal?.throwIfAborted();
+    const retryMessages: FetchAiMessage[] = [
+      ...messages,
+      {
+        role: 'user',
+        content:
+          'Your previous reply could not be used. Send the same content again as ONE complete, ' +
+          'valid JSON object: no prose, no code fences, all strings closed, and short enough to ' +
+          'finish within the token limit.',
+      },
+    ];
+    return parseJsonObject<T>(await requestCompletion(retryMessages, opts));
+  }
 }
 
 /** Extracts and parses the first JSON object from model output (tolerating code fences/prose). */
@@ -24,6 +49,13 @@ export function parseJsonObject<T>(raw: string): T {
   const start = withoutFences.indexOf('{');
   const end = withoutFences.lastIndexOf('}');
   if (start === -1 || end === -1 || end < start) {
+    // A reply that opens an object but never closes it is the signature of hitting the token
+    // ceiling — worth distinguishing, since the sections are long enough for that to happen.
+    if (start !== -1) {
+      throw new Error(
+        'Model response was cut off before the JSON object closed (raise FETCH_AI_MAX_TOKENS).',
+      );
+    }
     throw new Error('Model response did not contain a JSON object.');
   }
   try {
@@ -80,6 +112,50 @@ function coerceToText(item: unknown): string {
     if (strings.length) return strings.join(' — ');
   }
   return '';
+}
+
+/**
+ * Reduces "Admin: manages billing and users" to "Admin". Only strips a prefix short enough to be
+ * a label, so a value that legitimately contains a colon is left alone.
+ */
+export function toShortLabel(value: string): string {
+  const prefixed = /^([^:]{2,40}):\s+\S/.exec(value.trim());
+  return (prefixed ? prefixed[1] : value).trim().replace(/[.,;]+$/, '');
+}
+
+/**
+ * Like asTextArray, but for fields that must stay short labels (user roles, rendered as chips).
+ * Models routinely answer with `{ role, description }` objects or `"Admin: manages everything"`
+ * strings; both are reduced to just the label here, and duplicates are dropped.
+ */
+export function asLabelArray(value: unknown, field: string): string[] {
+  if (!Array.isArray(value)) {
+    throw new Error(`Model response field "${field}" is not an array.`);
+  }
+  const labels: string[] = [];
+  for (const item of value) {
+    let label = '';
+    if (item && typeof item === 'object') {
+      const obj = item as Record<string, unknown>;
+      const named = ['role', ...LABEL_KEYS]
+        .map((key) => obj[key])
+        .find((v) => typeof v === 'string' && v.trim() !== '');
+      label = typeof named === 'string' ? named : coerceToText(item);
+    } else {
+      label = coerceToText(item);
+    }
+    label = toShortLabel(label);
+    if (
+      label !== '' &&
+      !labels.some((existing) => existing.toLowerCase() === label.toLowerCase())
+    ) {
+      labels.push(label);
+    }
+  }
+  if (labels.length === 0) {
+    throw new Error(`Model response field "${field}" has no usable entries.`);
+  }
+  return labels;
 }
 
 /**

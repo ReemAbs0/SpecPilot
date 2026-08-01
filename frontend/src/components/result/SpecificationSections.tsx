@@ -25,7 +25,11 @@ export function SpecificationSections({ specification: spec }: { specification: 
         title="Project Summary"
         defaultOpen
       >
-        <p className="leading-relaxed text-slate-600 dark:text-slate-300">{spec.projectSummary}</p>
+        {/* Summaries, story narratives and milestone descriptions are multi-paragraph strings
+            (acceptance criteria, deliverables, exit criteria), so newlines must be preserved. */}
+        <p className="whitespace-pre-line leading-relaxed text-slate-600 dark:text-slate-300">
+          {spec.projectSummary}
+        </p>
       </SpecificationSection>
 
       <SpecificationSection icon={<Target className={ICON} />} title="Target Users" defaultOpen>
@@ -78,14 +82,19 @@ export function SpecificationSections({ specification: spec }: { specification: 
       <SpecificationSection icon={<BookOpen className={ICON} />} title="User Stories">
         <ul className="space-y-4">
           {spec.userStories.map((story, index) => (
-            <li key={index} className="rounded-xl border border-slate-100 dark:border-slate-800 p-4">
+            <li
+              key={index}
+              className="rounded-xl border border-slate-100 dark:border-slate-800 p-4"
+            >
               <div className="flex items-center justify-between gap-2">
                 <p className="font-semibold text-slate-900 dark:text-slate-100">{story.title}</p>
                 <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-xs font-medium text-slate-600 dark:text-slate-300">
                   {story.role}
                 </span>
               </div>
-              <p className="mt-1 text-slate-600 dark:text-slate-300">{story.narrative}</p>
+              <p className="mt-1 whitespace-pre-line text-slate-600 dark:text-slate-300">
+                {story.narrative}
+              </p>
             </li>
           ))}
         </ul>
@@ -100,7 +109,9 @@ export function SpecificationSections({ specification: spec }: { specification: 
               </span>
               <div>
                 <p className="font-semibold text-slate-900 dark:text-slate-100">{milestone.name}</p>
-                <p className="mt-1 text-slate-600 dark:text-slate-300">{milestone.description}</p>
+                <p className="mt-1 whitespace-pre-line text-slate-600 dark:text-slate-300">
+                  {milestone.description}
+                </p>
               </div>
             </li>
           ))}
