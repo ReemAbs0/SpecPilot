@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
@@ -90,16 +90,24 @@ function renderLibrary() {
   );
 }
 
-/** Seeds the generation context with a successful, already-persisted run before mounting. */
+/**
+ * Seeds the generation context with a successful, already-persisted run before mounting the
+ * routes, so ResultPage's "not success → redirect" guard doesn't fire during setup. Once the
+ * routes are up they stay mounted (as in the real app) even if the result is later cleared.
+ */
 function SeededResult({ savedId, children }: { savedId?: string; children: ReactNode }) {
   const { state, dispatch } = useSpecification();
+  const [seeded, setSeeded] = useState(false);
+  if (state.status === 'success' && !seeded) {
+    setSeeded(true);
+  }
   useEffect(() => {
     dispatch({ type: 'SUCCEEDED', specification: SPEC });
     if (savedId) {
       dispatch({ type: 'SAVED', id: savedId });
     }
   }, [dispatch, savedId]);
-  return state.status === 'success' ? <>{children}</> : null;
+  return seeded ? <>{children}</> : null;
 }
 
 function renderResult(savedId?: string) {
@@ -110,6 +118,7 @@ function renderResult(savedId?: string) {
           <Routes>
             <Route path="/result" element={<ResultPage />} />
             <Route path="/generate" element={<div>generator</div>} />
+            <Route path="/library" element={<div>library list</div>} />
           </Routes>
         </SeededResult>
       </SpecificationProvider>
@@ -298,6 +307,44 @@ describe('deleting a saved specification', () => {
 
     expect(await within(dialog).findByRole('alert')).toHaveTextContent(/couldn’t delete/i);
     expect(screen.getByText('Older Spec')).toBeInTheDocument();
+  });
+});
+
+describe('deleting from the result page', () => {
+  it('offers delete beside edit once the run has been saved, then returns to the library', async () => {
+    stubFetch({ status: 204 });
+    const user = userEvent.setup();
+    renderResult('saved-1');
+
+    await screen.findByRole('heading', { name: SPEC.title });
+    // Both icon actions sit in the header's icon group.
+    expect(screen.getByRole('button', { name: /edit specification title/i })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /delete specification/i }));
+
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByText(new RegExp(SPEC.title))).toBeInTheDocument();
+    await user.click(within(dialog).getByRole('button', { name: /^delete$/i }));
+
+    const del = await waitFor(() => {
+      const call = calls().find(([, init]) => init?.method === 'DELETE');
+      expect(call).toBeDefined();
+      return call!;
+    });
+    expect(del[0]).toBe('/api/me/specifications/saved-1');
+
+    // Redirected away, and the deleted result is no longer held in state.
+    expect(await screen.findByText('library list')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: SPEC.title })).not.toBeInTheDocument();
+  });
+
+  it('hides delete while the result has no stored record to remove', async () => {
+    stubFetch({ status: 204 });
+    renderResult();
+
+    await screen.findByRole('heading', { name: SPEC.title });
+    // Renaming is still available — it just stays local for an unsaved result.
+    expect(screen.getByRole('button', { name: /edit specification title/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /delete specification/i })).not.toBeInTheDocument();
   });
 });
 

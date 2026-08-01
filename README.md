@@ -142,8 +142,10 @@ The project is pinned in [`.firebaserc`](.firebaserc); update it to your own pro
   Enter or clicking away saves. When the specification exists in the account, the new title is
   written to Firestore before the screen updates; for a guest it simply renames the result on
   screen.
-- **Delete**: each library entry (and the open specification itself) can be deleted after a
-  confirmation prompt; deleting the specification currently open returns to the library.
+- **Delete**: the trash icon beside the title deletes a specification after a confirmation
+  prompt — from the library list, an open saved specification, or a fresh result once it has been
+  saved to the account. Deleting whatever is on screen returns to the library. A guest's result
+  has no stored record, so the action isn't offered there.
 - Auth-only routes (`/library`, `/library/:id`) are guarded and redirect to `/login` when signed
   out.
 

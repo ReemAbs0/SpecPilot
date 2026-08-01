@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FolderOpen, AlertTriangle, Sparkles } from 'lucide-react';
 import { useAuth } from '../state/AuthContext';
-import { deleteSpecification, listSpecifications } from '../services/specificationStore';
+import { useDeleteSpecification } from '../hooks/useDeleteSpecification';
+import { listSpecifications } from '../services/specificationStore';
 import { Button, ConfirmDialog, Spinner, Surface } from '../components/ui';
 import { SpecificationCard } from '../components/library/SpecificationCard';
 import type { SavedSpecificationSummary } from '../types/savedSpecification.types';
@@ -12,9 +13,9 @@ import type { SavedSpecificationSummary } from '../types/savedSpecification.type
 // wrapped by RequireAuth, so a user is always present when it renders. Auth and generation
 // behavior are untouched — this only reads persisted data.
 //
-// Each entry can be deleted: the card raises the intent, this page confirms it, calls
-// DELETE /api/me/specifications/:id through the service layer, and drops the row from the list
-// on success. Failures keep the dialog open with a message so nothing disappears silently.
+// Each entry can be deleted: the card raises the intent, the shared useDeleteSpecification flow
+// runs the confirmation and the DELETE, and this page just drops the row once the record is
+// gone. Failures keep the dialog open with a message so nothing disappears silently.
 
 type LoadState =
   | { status: 'loading' }
@@ -36,10 +37,16 @@ function sortNewestFirst(items: SavedSpecificationSummary[]): SavedSpecification
 export default function LibraryPage() {
   const { user } = useAuth();
   const [state, setState] = useState<LoadState>({ status: 'loading' });
-  /** The specification awaiting delete confirmation; null when no prompt is open. */
-  const [pendingDelete, setPendingDelete] = useState<SavedSpecificationSummary | null>(null);
-  const [deleting, setDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  /** Removes one specification from the list once Firestore has dropped it. */
+  const removeFromList = useCallback((id: string) => {
+    setState((current) =>
+      current.status === 'ready'
+        ? { ...current, specifications: current.specifications.filter((item) => item.id !== id) }
+        : current,
+    );
+  }, []);
+  const deletion = useDeleteSpecification(removeFromList);
 
   useEffect(() => {
     if (!user) {
@@ -71,51 +78,6 @@ export default function LibraryPage() {
       cancelled = true;
     };
   }, [user]);
-
-  function requestDelete(spec: SavedSpecificationSummary) {
-    setDeleteError(null);
-    setPendingDelete(spec);
-  }
-
-  function cancelDelete() {
-    if (!deleting) {
-      setPendingDelete(null);
-      setDeleteError(null);
-    }
-  }
-
-  /** Removes one specification from the list once Firestore has dropped it. */
-  function removeFromList(id: string) {
-    setState((current) =>
-      current.status === 'ready'
-        ? { ...current, specifications: current.specifications.filter((item) => item.id !== id) }
-        : current,
-    );
-  }
-
-  async function confirmDelete() {
-    if (!user || !pendingDelete || deleting) {
-      return;
-    }
-    setDeleting(true);
-    setDeleteError(null);
-    try {
-      const token = await user.getIdToken();
-      const result = await deleteSpecification(token, pendingDelete.id);
-      // A 404 means it is already gone (e.g. deleted in another tab) — the list should still
-      // stop showing it, so treat that as success rather than an error the user can't act on.
-      if (result.ok || result.notFound) {
-        removeFromList(pendingDelete.id);
-        setPendingDelete(null);
-      } else {
-        setDeleteError('We couldn’t delete this specification. Please try again.');
-      }
-    } catch {
-      setDeleteError('We couldn’t delete this specification. Please try again.');
-    } finally {
-      setDeleting(false);
-    }
-  }
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
@@ -173,29 +135,17 @@ export default function LibraryPage() {
           <ul className="flex flex-col gap-3">
             {state.specifications.map((spec) => (
               <li key={spec.id}>
-                <SpecificationCard spec={spec} onDelete={requestDelete} />
+                <SpecificationCard
+                  spec={spec}
+                  onDelete={(item) => deletion.request({ id: item.id, title: item.title })}
+                />
               </li>
             ))}
           </ul>
         )}
       </div>
 
-      <ConfirmDialog
-        open={pendingDelete !== null}
-        title="Delete specification?"
-        message={
-          <>
-            “{pendingDelete?.title}” will be permanently removed from your account. This can’t be
-            undone.
-          </>
-        }
-        confirmLabel="Delete"
-        busyLabel="Deleting…"
-        busy={deleting}
-        error={deleteError}
-        onConfirm={confirmDelete}
-        onCancel={cancelDelete}
-      />
+      <ConfirmDialog {...deletion.dialogProps} />
     </div>
   );
 }

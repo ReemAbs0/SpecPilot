@@ -1,13 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { AlertTriangle, ArrowLeft, FileQuestion } from 'lucide-react';
 import { useAuth } from '../state/AuthContext';
 import { useSpecification } from '../state/SpecificationContext';
-import {
-  deleteSpecification,
-  getSpecification,
-  updateSpecificationTitle,
-} from '../services/specificationStore';
+import { useDeleteSpecification } from '../hooks/useDeleteSpecification';
+import { getSpecification, updateSpecificationTitle } from '../services/specificationStore';
 import { ResultHeader } from '../components/result/ResultHeader';
 import { SpecificationSections } from '../components/result/SpecificationSections';
 import { ActionsPanel } from '../components/result/ActionsPanel';
@@ -59,9 +56,13 @@ export default function SavedSpecificationPage() {
   const { dispatch } = useSpecification();
   const navigate = useNavigate();
   const [state, setState] = useState<LoadState>({ status: 'loading' });
-  const [confirmingDelete, setConfirmingDelete] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  // Deleting the specification this page is showing leaves nothing to render, so go back to the
+  // library. The confirmation and the DELETE itself are the shared flow.
+  const handleDeleted = useCallback(() => {
+    navigate('/library', { replace: true });
+  }, [navigate]);
+  const deletion = useDeleteSpecification(handleDeleted);
 
   useEffect(() => {
     if (!user || !id) {
@@ -121,28 +122,6 @@ export default function SavedSpecificationPage() {
           }
         : current,
     );
-  }
-
-  async function handleConfirmDelete() {
-    if (!user || !id || deleting) {
-      return;
-    }
-    setDeleting(true);
-    setDeleteError(null);
-    try {
-      const result = await deleteSpecification(await user.getIdToken(), id);
-      // Already gone (404) counts as deleted — either way this page has nothing left to show.
-      if (result.ok || result.notFound) {
-        setConfirmingDelete(false);
-        navigate('/library', { replace: true });
-        return;
-      }
-      setDeleteError('We couldn’t delete this specification. Please try again.');
-    } catch {
-      setDeleteError('We couldn’t delete this specification. Please try again.');
-    } finally {
-      setDeleting(false);
-    }
   }
 
   if (state.status === 'loading') {
@@ -205,10 +184,7 @@ export default function SavedSpecificationPage() {
           title={spec.title}
           timestamp={formatSavedAt(state.saved.createdAt)}
           onSaveTitle={handleSaveTitle}
-          onDelete={() => {
-            setDeleteError(null);
-            setConfirmingDelete(true);
-          }}
+          onDelete={() => deletion.request({ id: state.saved.id, title: state.saved.title })}
         />
       </div>
 
@@ -222,24 +198,7 @@ export default function SavedSpecificationPage() {
         </aside>
       </div>
 
-      <ConfirmDialog
-        open={confirmingDelete}
-        title="Delete specification?"
-        message={
-          <>“{state.saved.title}” will be permanently removed from your account. This can’t be undone.</>
-        }
-        confirmLabel="Delete"
-        busyLabel="Deleting…"
-        busy={deleting}
-        error={deleteError}
-        onConfirm={handleConfirmDelete}
-        onCancel={() => {
-          if (!deleting) {
-            setConfirmingDelete(false);
-            setDeleteError(null);
-          }
-        }}
-      />
+      <ConfirmDialog {...deletion.dialogProps} />
     </div>
   );
 }

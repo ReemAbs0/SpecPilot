@@ -57,7 +57,8 @@ export type SpecAction =
   // The user renamed the specification from the result page.
   | { type: 'TITLE_UPDATED'; title: string }
   | { type: 'FAILED'; reason: GenerationFailureReason }
-  // Cancel an in-progress generation (FR-011b): return to idle but keep the idea text.
+  // Return to idle but keep the idea text: cancelling an in-progress generation (FR-011b), and
+  // also discarding a finished result the user has just deleted from their account.
   | { type: 'CANCEL' };
 
 export function specReducer(state: SpecState, action: SpecAction): SpecState {
