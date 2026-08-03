@@ -1,11 +1,10 @@
 import { Composition, Folder } from "remotion";
 import "./index.css";
-import { DarkModeScene } from "./SpecPilot/DarkModeScene";
 import { FeatureScene } from "./SpecPilot/FeatureScene";
 import { IntroScene } from "./SpecPilot/IntroScene";
-import { LightModeScene } from "./SpecPilot/LightModeScene";
 import { OutroScene } from "./SpecPilot/OutroScene";
 import { Showcase } from "./SpecPilot/Showcase";
+import { ThemeShowcaseScene } from "./SpecPilot/ThemeShowcaseScene";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -13,7 +12,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="SpecPilotShowcase"
         component={Showcase}
-        durationInFrames={1800}
+        durationInFrames={1530}
         fps={30}
         width={1920}
         height={1080}
@@ -35,28 +34,28 @@ export const RemotionRoot: React.FC = () => {
           width={1920}
           height={1080}
           defaultProps={{
-            screenshot: "screenshots/landingPage-material-theme-dark.png",
-            index: "01 / 08",
+            screenshot: "screenshots/landingPage.png",
+            index: "01 / 07",
             title: "Landing Page",
             subtitle:
               "One clear promise, one call to action — straight into the generator.",
           }}
         />
         <Composition
-          id="LightMode"
-          component={LightModeScene}
+          id="ThemeShowcase"
+          component={ThemeShowcaseScene}
           durationInFrames={150}
           fps={30}
           width={1920}
           height={1080}
-        />
-        <Composition
-          id="DarkMode"
-          component={DarkModeScene}
-          durationInFrames={150}
-          fps={30}
-          width={1920}
-          height={1080}
+          defaultProps={{
+            lightScreenshot: "screenshots/classic-theme-light.png",
+            darkScreenshot: "screenshots/classic-theme-dark.png",
+            index: "02 / 07",
+            title: "Classic Theme",
+            subtitle:
+              "The original look — soft surfaces, rounded pills, calm indigo accent.",
+          }}
         />
         <Composition
           id="Outro"

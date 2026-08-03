@@ -8,15 +8,15 @@ import {
 import { fontFamily } from "./font";
 import { RocketMark } from "./RocketMark";
 
+/** Mirrors the scene order in Showcase.tsx. */
 const RECAP = [
   "Landing Page",
-  "AI Generation",
-  "Sign In / Sign Up",
-  "Saved Library",
   "Classic Theme",
   "Material Theme",
-  "Light Mode",
-  "Dark Mode",
+  "Light & Dark",
+  "Sign In / Sign Up",
+  "AI Generation",
+  "Saved Library",
 ];
 
 export const OutroScene: React.FC = () => {
