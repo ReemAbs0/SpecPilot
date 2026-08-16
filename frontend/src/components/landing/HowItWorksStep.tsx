@@ -29,11 +29,11 @@ export const STEPS: Step[] = [
 export function HowItWorksStep({ icon, label, caption }: Step) {
   return (
     <div className="flex flex-col items-center text-center">
-      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-100 text-brand-600">
+      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-100 dark:bg-brand-500/20 text-brand-600 dark:text-brand-400">
         {icon}
       </span>
-      <p className="mt-3 text-sm font-semibold text-slate-900">{label}</p>
-      <p className="mt-1 text-sm text-slate-500">{caption}</p>
+      <p className="mt-3 text-sm font-semibold text-slate-900 dark:text-slate-100">{label}</p>
+      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{caption}</p>
     </div>
   );
 }

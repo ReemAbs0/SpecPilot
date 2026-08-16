@@ -48,11 +48,11 @@ export const FEATURES: Feature[] = [
 export function FeatureCard({ icon, title, description }: Feature) {
   return (
     <Card>
-      <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+      <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400">
         {icon}
       </span>
-      <h3 className="mt-4 text-base font-semibold text-slate-900">{title}</h3>
-      <p className="mt-1 text-sm text-slate-500">{description}</p>
+      <h3 className="mt-4 text-base font-semibold text-slate-900 dark:text-slate-100">{title}</h3>
+      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{description}</p>
     </Card>
   );
 }

@@ -1,24 +1,27 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import {
-  FileText,
-  Target,
-  Users,
-  ClipboardList,
-  Gauge,
-  BookOpen,
-  Milestone,
-  Cpu,
-} from 'lucide-react';
 import { useSpecification } from '../state/SpecificationContext';
+import { useAuth } from '../state/AuthContext';
+import { useDeleteSpecification } from '../hooks/useDeleteSpecification';
+import { updateSpecificationTitle } from '../services/specificationStore';
 import { ResultHeader } from '../components/result/ResultHeader';
-import { SpecificationSection } from '../components/result/SpecificationSection';
+import { SpecificationSections } from '../components/result/SpecificationSections';
 import { ActionsPanel } from '../components/result/ActionsPanel';
+import { ConfirmDialog } from '../components/ui';
 
 // Generated Specification page (T028). Renders the eight structured sections of the result
-// alongside the Actions sidebar (download / copy / generate again — User Story 3).
-
-const ICON = 'h-5 w-5';
+// (via the shared SpecificationSections component) alongside the Actions sidebar (download /
+// copy / generate again — User Story 3).
+//
+// The title can be renamed in place from the header. The rename updates the in-memory
+// specification immediately, and — when this run was persisted to a signed-in user's account
+// (state.savedId) — is written to Firestore first so the two never drift apart.
+//
+// The header also offers delete, but only once `state.savedId` exists: a guest's result (or one
+// whose background save hasn't landed) has no stored record to remove, so the action would have
+// nothing to act on and is hidden rather than shown inert. Deleting takes the same confirm →
+// Firestore path as the library (useDeleteSpecification), then clears the now-orphaned result
+// from state and returns to the library.
 
 function formatTimestamp(): string {
   const time = new Date().toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
@@ -26,10 +29,27 @@ function formatTimestamp(): string {
 }
 
 export default function ResultPage() {
-  const { state } = useSpecification();
+  const { state, dispatch } = useSpecification();
+  const { user } = useAuth();
   const timestamp = useMemo(() => formatTimestamp(), []);
+  // Set when this result's stored record has just been deleted, so the redirect below sends the
+  // user to their library rather than the generator.
+  const [deleted, setDeleted] = useState(false);
+
+  const handleDeleted = useCallback(() => {
+    // Drop the result from state as well: the specification no longer exists in the account, so
+    // keeping it would let a back-navigation resurrect a deleted document on screen. Both updates
+    // land in one render, and clearing the result trips the guard below — which owns every way of
+    // leaving this page, so there is no redirect to race with.
+    setDeleted(true);
+    dispatch({ type: 'CANCEL' });
+  }, [dispatch]);
+  const deletion = useDeleteSpecification(handleDeleted);
 
   if (state.status !== 'success' || !state.specification) {
+    if (deleted) {
+      return <Navigate to="/library" replace />;
+    }
     // A regeneration started from this page (or its failure) belongs on the progress screen,
     // not the empty generator — this also avoids a redirect race when "Generate Again" flips
     // the status to 'generating' while this page is still mounted.
@@ -39,114 +59,37 @@ export default function ResultPage() {
   }
 
   const spec = state.specification;
+  const savedId = state.savedId;
+
+  /**
+   * Renames the specification. Persists first when there is a stored record, and only then
+   * updates local state — so a failed write surfaces as an error in the header instead of
+   * leaving the screen showing a title the account doesn't have. Throwing signals that failure.
+   */
+  async function handleSaveTitle(nextTitle: string) {
+    if (user && savedId) {
+      const token = await user.getIdToken();
+      const result = await updateSpecificationTitle(token, savedId, nextTitle);
+      if (!result.ok) {
+        throw new Error(result.error ?? 'rename_failed');
+      }
+    }
+    dispatch({ type: 'TITLE_UPDATED', title: nextTitle });
+  }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-      <ResultHeader title={spec.title} timestamp={timestamp} />
+      <ResultHeader
+        title={spec.title}
+        timestamp={timestamp}
+        onSaveTitle={handleSaveTitle}
+        onDelete={
+          savedId ? () => deletion.request({ id: savedId, title: spec.title }) : undefined
+        }
+      />
 
       <div className="mt-8 grid gap-6 lg:grid-cols-3">
-        <div className="flex flex-col gap-5 lg:col-span-2">
-          <SpecificationSection
-            icon={<FileText className={ICON} />}
-            title="Project Summary"
-            defaultOpen
-          >
-            <p className="leading-relaxed text-slate-600">{spec.projectSummary}</p>
-          </SpecificationSection>
-
-          <SpecificationSection icon={<Target className={ICON} />} title="Target Users" defaultOpen>
-            <div className="rounded-xl bg-surface-lavender p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Target Audience
-              </p>
-              <p className="mt-1 text-slate-700">{spec.targetUsers}</p>
-            </div>
-          </SpecificationSection>
-
-          <SpecificationSection icon={<Users className={ICON} />} title="User Roles">
-            <ul className="flex flex-wrap gap-2">
-              {spec.userRoles.map((role) => (
-                <li
-                  key={role}
-                  className="rounded-full bg-brand-50 px-3 py-1 text-sm font-medium text-brand-700"
-                >
-                  {role}
-                </li>
-              ))}
-            </ul>
-          </SpecificationSection>
-
-          <SpecificationSection
-            icon={<ClipboardList className={ICON} />}
-            title="Functional Requirements"
-            defaultOpen
-          >
-            <ul className="space-y-4">
-              {spec.functionalRequirements.map((requirement, index) => (
-                <li key={index} className="flex gap-3">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-700">
-                    F{index + 1}
-                  </span>
-                  <p className="text-slate-600">{requirement}</p>
-                </li>
-              ))}
-            </ul>
-          </SpecificationSection>
-
-          <SpecificationSection
-            icon={<Gauge className={ICON} />}
-            title="Non-functional Requirements"
-          >
-            <ul className="list-disc space-y-2 pl-5 text-slate-600">
-              {spec.nonFunctionalRequirements.map((requirement, index) => (
-                <li key={index}>{requirement}</li>
-              ))}
-            </ul>
-          </SpecificationSection>
-
-          <SpecificationSection icon={<BookOpen className={ICON} />} title="User Stories">
-            <ul className="space-y-4">
-              {spec.userStories.map((story, index) => (
-                <li key={index} className="rounded-xl border border-slate-100 p-4">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="font-semibold text-slate-900">{story.title}</p>
-                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
-                      {story.role}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-slate-600">{story.narrative}</p>
-                </li>
-              ))}
-            </ul>
-          </SpecificationSection>
-
-          <SpecificationSection
-            icon={<Milestone className={ICON} />}
-            title="Development Milestones"
-          >
-            <ol className="space-y-4">
-              {spec.milestones.map((milestone) => (
-                <li key={milestone.order} className="flex gap-3">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-50 text-xs font-semibold text-brand-700">
-                    {milestone.order}
-                  </span>
-                  <div>
-                    <p className="font-semibold text-slate-900">{milestone.name}</p>
-                    <p className="mt-1 text-slate-600">{milestone.description}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </SpecificationSection>
-
-          <SpecificationSection icon={<Cpu className={ICON} />} title="Technical Considerations">
-            <ul className="list-disc space-y-2 pl-5 text-slate-600">
-              {spec.technicalConsiderations.map((consideration, index) => (
-                <li key={index}>{consideration}</li>
-              ))}
-            </ul>
-          </SpecificationSection>
-        </div>
+        <SpecificationSections specification={spec} />
 
         <aside className="lg:col-span-1">
           <div className="lg:sticky lg:top-24">
@@ -154,6 +97,8 @@ export default function ResultPage() {
           </div>
         </aside>
       </div>
+
+      <ConfirmDialog {...deletion.dialogProps} />
     </div>
   );
 }

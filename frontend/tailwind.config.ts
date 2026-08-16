@@ -5,6 +5,11 @@ import type { Config } from 'tailwindcss';
 // values, so the palette/spacing stays consistent across all four screens.
 const config: Config = {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
+  // Dark mode (feature/dark-mode) is opt-in via a `.dark` class on <html>, toggled by
+  // ThemeModeProvider from the persisted `colorMode`. This keeps the Classic (Tailwind) light
+  // theme byte-identical unless dark mode is explicitly selected, and stays independent of the
+  // Classic/Material design-system axis.
+  darkMode: 'selector',
   theme: {
     extend: {
       colors: {

@@ -111,14 +111,17 @@ async function runStage(
     case 'understanding-idea':
       Object.assign(draft, await analyzeIdea(ideaText, opts));
       break;
+    // Each stage after the first receives the draft built so far, so its prompt can reuse the
+    // roles, entities and requirements already written instead of re-deriving them (which is
+    // what made sections drift apart and repeat each other).
     case 'generating-requirements':
-      Object.assign(draft, await generateRequirements(ideaText, opts));
+      Object.assign(draft, await generateRequirements(ideaText, draft, opts));
       break;
     case 'creating-user-stories':
-      Object.assign(draft, await generateUserStories(ideaText, draft.userRoles ?? [], opts));
+      Object.assign(draft, await generateUserStories(ideaText, draft, opts));
       break;
     case 'preparing-milestones':
-      Object.assign(draft, await planMilestones(ideaText, opts));
+      Object.assign(draft, await planMilestones(ideaText, draft, opts));
       break;
     case 'formatting-document':
       // Formatting assembles + validates the complete specification from the draft.
@@ -144,7 +147,9 @@ export async function runGeneration(
     session.idleCleanup = null;
   }
 
-  const timeoutMs = Number(process.env.GENERATION_TIMEOUT_MS) || 90_000;
+  // The stages now request substantially longer sections, so the five sequential calls need more
+  // headroom than the original 90s (FR-011a fixes the existence of a limit, not its value).
+  const timeoutMs = Number(process.env.GENERATION_TIMEOUT_MS) || 180_000;
   const timer = setTimeout(() => {
     session.timedOut = true;
     session.abort.abort();

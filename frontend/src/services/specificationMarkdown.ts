@@ -30,7 +30,14 @@ export function specificationToMarkdown(spec: Specification): string {
   });
 
   lines.push('## Development Milestones', '');
-  spec.milestones.forEach((m) => lines.push(`${m.order}. **${m.name}** — ${m.description}`));
+  spec.milestones.forEach((m) => {
+    // A milestone description may carry deliverables and exit criteria as extra paragraphs.
+    // The first line stays inline with the numbered item; the rest is indented so Markdown keeps
+    // it inside that list item instead of breaking the numbering.
+    const [first, ...rest] = m.description.split('\n');
+    lines.push(`${m.order}. **${m.name}** — ${first}`);
+    rest.forEach((line) => lines.push(line.trim() === '' ? '' : `   ${line}`));
+  });
   lines.push('');
 
   lines.push('## Technical Considerations', '');

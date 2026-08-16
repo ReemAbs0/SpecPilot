@@ -22,7 +22,13 @@ interface FetchAiConfig {
   apiKey: string;
   endpointUrl: string;
   model: string;
+  maxTokens: number;
 }
+
+// The agent prompts ask for full specification sections, so a reply can run to a few thousand
+// tokens. Endpoint defaults are typically far lower, and a truncated reply is unparseable JSON
+// (i.e. a failed generation) rather than a short one — so the ceiling is requested explicitly.
+const DEFAULT_MAX_TOKENS = 6000;
 
 /**
  * Reads and validates client configuration from the environment at call time (not module
@@ -33,6 +39,7 @@ function getConfig(): FetchAiConfig {
   const apiKey = process.env.FETCH_AI_API_KEY;
   const endpointUrl = process.env.FETCH_AI_ENDPOINT_URL;
   const model = process.env.FETCH_AI_MODEL ?? 'asi1-mini';
+  const maxTokens = Number(process.env.FETCH_AI_MAX_TOKENS) || DEFAULT_MAX_TOKENS;
 
   if (!apiKey) {
     throw new FetchAiError('FETCH_AI_API_KEY is not set.');
@@ -40,7 +47,7 @@ function getConfig(): FetchAiConfig {
   if (!endpointUrl) {
     throw new FetchAiError('FETCH_AI_ENDPOINT_URL is not set.');
   }
-  return { apiKey, endpointUrl, model };
+  return { apiKey, endpointUrl, model, maxTokens };
 }
 
 interface ChatCompletionResponse {
@@ -59,7 +66,7 @@ export async function requestCompletion(
   messages: FetchAiMessage[],
   options: { signal?: AbortSignal } = {},
 ): Promise<string> {
-  const { apiKey, endpointUrl, model } = getConfig();
+  const { apiKey, endpointUrl, model, maxTokens } = getConfig();
   const url = `${endpointUrl.replace(/\/$/, '')}/chat/completions`;
 
   let response: Response;
@@ -70,7 +77,7 @@ export async function requestCompletion(
         'Content-Type': 'application/json',
         Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({ model, messages }),
+      body: JSON.stringify({ model, messages, max_tokens: maxTokens }),
       signal: options.signal,
     });
   } catch (error) {

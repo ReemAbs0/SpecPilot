@@ -10,6 +10,11 @@ build/
 .env.*
 !.env.example
 
+# Firebase service account credentials (secret — never commit)
+firebase-service-account.json
+*serviceAccount*.json
+*service-account*.json
+
 # Logs
 *.log
 npm-debug.log*
@@ -26,3 +31,6 @@ coverage/
 .DS_Store
 Thumbs.db
 *.swp
+
+backend/firebase-service-account.json
+.DS_Store

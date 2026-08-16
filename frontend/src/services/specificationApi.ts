@@ -3,9 +3,11 @@ import type {
   GenerationStage,
   Specification,
 } from '../types/specification.types';
+import { apiUrl } from './apiBase';
 
-// Talks to the backend generation endpoints (T026). Uses relative /api URLs so the Vite dev
-// proxy (and same-origin production) handles routing without CORS. See contracts/api.md.
+// Talks to the backend generation endpoints (T026). URLs are built via apiUrl(): relative in
+// dev (Vite proxy) and absolute cross-origin in production (VITE_API_BASE_URL → Render backend,
+// which enables CORS). See contracts/api.md.
 
 export interface StartSuccess {
   ok: true;
@@ -21,7 +23,7 @@ export type StartResult = StartSuccess | StartFailure;
 export async function startGeneration(ideaText: string): Promise<StartResult> {
   let response: Response;
   try {
-    response = await fetch('/api/specifications', {
+    response = await fetch(apiUrl('/api/specifications'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ idea: ideaText }),
@@ -67,7 +69,7 @@ export interface StreamHandlers {
  * is surfaced as a failure with reason 'upstream-error' (contracts/api.md).
  */
 export function openStream(sessionId: string, handlers: StreamHandlers): () => void {
-  const source = new EventSource(`/api/specifications/${sessionId}/stream`);
+  const source = new EventSource(apiUrl(`/api/specifications/${sessionId}/stream`));
   let terminal = false;
 
   const finish = () => {

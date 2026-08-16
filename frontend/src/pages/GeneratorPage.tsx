@@ -33,8 +33,8 @@ export default function GeneratorPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-      <h1 className="text-3xl font-bold text-slate-900">Generate Software Specification</h1>
-      <p className="mt-2 max-w-2xl text-slate-500">
+      <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">Generate Software Specification</h1>
+      <p className="mt-2 max-w-2xl text-slate-500 dark:text-slate-400">
         Describe your idea, and our AI will instantly generate a comprehensive, structured software
         specification document.
       </p>

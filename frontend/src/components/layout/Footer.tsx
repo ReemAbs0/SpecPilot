@@ -33,26 +33,26 @@ const columns = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-slate-100 bg-surface-muted">
+    <footer className="border-t border-slate-100 dark:border-slate-800 bg-surface-muted dark:bg-slate-950">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           <div className="col-span-2 md:col-span-1">
             <Link to="/" aria-label="SpecPilot home" className="flex items-center gap-2">
-              <Rocket className="h-5 w-5 text-brand-600" aria-hidden="true" />
-              <span className="text-lg font-bold text-brand-700">SpecPilot</span>
+              <Rocket className="h-5 w-5 text-brand-600 dark:text-brand-400" aria-hidden="true" />
+              <span className="text-lg font-bold text-brand-700 dark:text-brand-300">SpecPilot</span>
             </Link>
-            <p className="mt-2 text-sm text-slate-500">Built with Fetch AI.</p>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Built with Fetch AI.</p>
           </div>
 
           {columns.map((column) => (
             <div key={column.heading}>
-              <h2 className="text-sm font-semibold text-slate-900">{column.heading}</h2>
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">{column.heading}</h2>
               <ul className="mt-3 space-y-2">
                 {column.links.map((link) => (
                   <li key={link.label}>
                     <a
                       href={link.href}
-                      className="rounded-md text-sm text-slate-500 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+                      className="rounded-md text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
                     >
                       {link.label}
                     </a>
@@ -63,7 +63,7 @@ export function Footer() {
           ))}
         </div>
 
-        <p className="mt-10 text-sm text-slate-400">© 2026 SpecPilot. Built with Fetch AI.</p>
+        <p className="mt-10 text-sm text-slate-400 dark:text-slate-500">© 2026 SpecPilot. Built with Fetch AI.</p>
       </div>
     </footer>
   );

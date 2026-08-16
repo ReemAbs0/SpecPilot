@@ -1,0 +1,115 @@
+import { useState, type FormEvent } from 'react';
+import { LogIn, UserPlus, Loader2 } from 'lucide-react';
+import { Button, Card, TextField } from '../ui';
+
+// Shared email/password form for the Login and Signup pages (feature/firebase-auth, Phase 2).
+// Presentational: it owns only local field state + lightweight client validation, and hands
+// the values to the page via `onSubmit`. The page performs the Firebase call and passes back
+// `isSubmitting` / `submitError`.
+
+export type AuthFormMode = 'login' | 'signup';
+
+const COPY: Record<AuthFormMode, { title: string; subtitle: string; action: string }> = {
+  login: {
+    title: 'Welcome back',
+    subtitle: 'Sign in to access your saved specifications.',
+    action: 'Sign In',
+  },
+  signup: {
+    title: 'Create your account',
+    subtitle: 'Sign up to automatically save every specification you generate.',
+    action: 'Create Account',
+  },
+};
+
+// Firebase requires a minimum password length of 6.
+const PASSWORD_MIN_LENGTH = 6;
+
+export interface AuthFormProps {
+  mode: AuthFormMode;
+  onSubmit: (email: string, password: string) => void;
+  isSubmitting: boolean;
+  submitError?: string | null;
+}
+
+export function AuthForm({ mode, onSubmit, isSubmitting, submitError }: AuthFormProps) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [clientError, setClientError] = useState<string | null>(null);
+  const copy = COPY[mode];
+  const Icon = mode === 'login' ? LogIn : UserPlus;
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const trimmedEmail = email.trim();
+    if (trimmedEmail === '') {
+      setClientError('Please enter your email address.');
+      return;
+    }
+    if (password.length < PASSWORD_MIN_LENGTH) {
+      setClientError(`Password should be at least ${PASSWORD_MIN_LENGTH} characters.`);
+      return;
+    }
+    setClientError(null);
+    onSubmit(trimmedEmail, password);
+  }
+
+  const error = clientError ?? submitError ?? null;
+
+  return (
+    <Card className="w-full max-w-md p-0">
+      <div className="border-b border-slate-100 dark:border-slate-800 px-6 py-5">
+        <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">{copy.title}</h1>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{copy.subtitle}</p>
+      </div>
+
+      <form className="flex flex-col gap-4 px-6 py-6" onSubmit={handleSubmit} noValidate>
+        <TextField
+          id="email"
+          label="Email"
+          type="email"
+          autoComplete="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          disabled={isSubmitting}
+          invalid={error ? true : undefined}
+          placeholder="you@example.com"
+        />
+
+        <TextField
+          id="password"
+          label="Password"
+          type="password"
+          autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          disabled={isSubmitting}
+          invalid={error ? true : undefined}
+          describedBy={error ? 'auth-error' : undefined}
+          placeholder={mode === 'signup' ? 'At least 6 characters' : 'Your password'}
+        />
+
+        {error && (
+          <p id="auth-error" role="alert" className="text-sm text-red-600 dark:text-red-400">
+            {error}
+          </p>
+        )}
+
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          className="mt-1 w-full"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+          ) : (
+            <Icon className="h-4 w-4" aria-hidden="true" />
+          )}
+          {isSubmitting ? 'Please wait…' : copy.action}
+        </Button>
+      </form>
+    </Card>
+  );
+}

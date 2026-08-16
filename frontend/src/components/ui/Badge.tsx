@@ -1,30 +1,26 @@
 import { type HTMLAttributes } from 'react';
-import { cn } from './cn';
+import { useThemeMode } from '../../state/ThemeContext';
+import { ClassicBadge } from './Badge.classic';
+import { MaterialBadge } from './Badge.material';
 
-// Shared badge/pill primitive (T013). Matches the "AI Powered" and "Generated Successfully"
-// pills in the approved designs.
+// Theme-aware badge primitive (feature/material-theme). Same public API as the original Badge,
+// dispatching to the Classic (Tailwind span) or Material (MUI Chip) implementation.
 
 export type BadgeVariant = 'brand' | 'success' | 'neutral';
-
-const variants: Record<BadgeVariant, string> = {
-  brand: 'bg-brand-50 text-brand-700',
-  success: 'bg-brand-50 text-brand-700',
-  neutral: 'bg-slate-100 text-slate-600',
-};
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   variant?: BadgeVariant;
 }
 
-export function Badge({ variant = 'brand', className, ...props }: BadgeProps) {
-  return (
-    <span
-      className={cn(
-        'inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium',
-        variants[variant],
-        className,
-      )}
-      {...props}
-    />
-  );
+export function Badge(props: BadgeProps) {
+  const { mode } = useThemeMode();
+  if (mode === 'material') {
+    const { variant, className, children } = props;
+    return (
+      <MaterialBadge variant={variant} className={className}>
+        {children}
+      </MaterialBadge>
+    );
+  }
+  return <ClassicBadge {...props} />;
 }

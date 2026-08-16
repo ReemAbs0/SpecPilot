@@ -13,6 +13,12 @@ export type SpecStatus = 'idle' | 'submitting' | 'generating' | 'success' | 'err
 
 export interface SpecState {
   status: SpecStatus;
+  /**
+   * Firebase uid of the account this state belongs to; null while signed out (a guest session).
+   * Generation state is per-user, so every value below is only ever valid for this owner —
+   * see the AUTH_CHANGED case for how a change of owner is handled.
+   */
+  ownerUid: string | null;
   /** The current idea text. Preserved across retry so the user never re-types it (FR-011). */
   ideaText: string;
   /** Correlates the active session to its SSE stream; null until generation starts. */
@@ -23,17 +29,25 @@ export interface SpecState {
   completedStages: GenerationStage[];
   /** The generated specification; set on success. */
   specification: Specification | null;
+  /**
+   * Firestore id of the current specification once it has been persisted to a signed-in user's
+   * account. null for guests, and until the best-effort save resolves — a title edit then only
+   * updates local state (there is nothing to persist to).
+   */
+  savedId: string | null;
   /** Why generation failed; set on error (FR-011/FR-011a). */
   error: GenerationFailureReason | null;
 }
 
 export const initialSpecState: SpecState = {
   status: 'idle',
+  ownerUid: null,
   ideaText: '',
   sessionId: null,
   activeStage: null,
   completedStages: [],
   specification: null,
+  savedId: null,
   error: null,
 };
 
@@ -45,16 +59,26 @@ export type SpecAction =
   | { type: 'STAGE_STARTED'; stage: GenerationStage }
   | { type: 'STAGE_COMPLETED'; stage: GenerationStage }
   | { type: 'SUCCEEDED'; specification: Specification }
+  // The specification was persisted to the signed-in user's account (best-effort, after success).
+  | { type: 'SAVED'; id: string }
+  // The user renamed the specification from the result page.
+  | { type: 'TITLE_UPDATED'; title: string }
   | { type: 'FAILED'; reason: GenerationFailureReason }
-  // Cancel an in-progress generation (FR-011b): return to idle but keep the idea text.
-  | { type: 'CANCEL' };
+  // Return to idle but keep the idea text: cancelling an in-progress generation (FR-011b), and
+  // also discarding a finished result the user has just deleted from their account.
+  | { type: 'CANCEL' }
+  // The signed-in identity resolved or changed. `uid` is the current user's uid, or null when
+  // signed out. Dispatched by SpecificationProvider from the auth subscription.
+  | { type: 'AUTH_CHANGED'; uid: string | null };
 
 export function specReducer(state: SpecState, action: SpecAction): SpecState {
   switch (action.type) {
     case 'SET_IDEA':
       return { ...state, ideaText: action.text };
     case 'SUBMIT':
-      return { ...state, status: 'submitting', error: null, specification: null };
+      // A new run replaces the previous result, so the previous saved record is no longer the
+      // one on screen — drop its id (the new run gets its own on save).
+      return { ...state, status: 'submitting', error: null, specification: null, savedId: null };
     case 'GENERATION_STARTED':
       return {
         ...state,
@@ -62,6 +86,7 @@ export function specReducer(state: SpecState, action: SpecAction): SpecState {
         sessionId: action.sessionId,
         activeStage: null,
         completedStages: [],
+        savedId: null,
         error: null,
       };
     case 'STAGE_STARTED':
@@ -80,11 +105,36 @@ export function specReducer(state: SpecState, action: SpecAction): SpecState {
         specification: action.specification,
         activeStage: null,
       };
+    case 'SAVED':
+      return { ...state, savedId: action.id };
+    case 'TITLE_UPDATED':
+      // Nothing to rename before a specification exists; ignore rather than fabricate one.
+      return state.specification
+        ? { ...state, specification: { ...state.specification, title: action.title } }
+        : state;
     case 'FAILED':
       return { ...state, status: 'error', error: action.reason, activeStage: null };
     case 'CANCEL':
-      // Keep ideaText so the user can resubmit without re-typing (FR-011b).
-      return { ...initialSpecState, ideaText: state.ideaText };
+      // Keep ideaText so the user can resubmit without re-typing (FR-011b). ownerUid is not
+      // flow state — it identifies whose state this is, so it survives every in-session reset.
+      return { ...initialSpecState, ideaText: state.ideaText, ownerUid: state.ownerUid };
+    case 'AUTH_CHANGED': {
+      if (action.uid === state.ownerUid) {
+        // Same identity (including a token refresh, or the initial resolution of a restored
+        // session): nothing changed hands, so an in-flight generation must not be disturbed.
+        return state;
+      }
+      if (state.ownerUid === null) {
+        // Guest → signed in. The work in progress was done by the person at this browser, who
+        // has just identified themselves, so it carries over (this is the "generate, then sign
+        // in to save it" path). No other account's data can be here: signing out wipes it.
+        return { ...state, ownerUid: action.uid };
+      }
+      // Signed out, or switched straight to another account. Everything here belongs to the
+      // previous account — idea text, the generated specification and its Firestore id — so it
+      // is discarded wholesale rather than field by field.
+      return { ...initialSpecState, ownerUid: action.uid };
+    }
     default:
       return state;
   }
